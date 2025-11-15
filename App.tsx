@@ -1,0 +1,170 @@
+
+import React, { useState, useCallback } from 'react';
+import { useLocalStorage } from './hooks/useLocalStorage';
+// FIX: Import EmployeeStatus to use enum values for type safety.
+import { Employee, PayrollEntry, SettlementEntry, Parameter, AppView, EmployeeStatus } from './types';
+import { DEFAULT_PARAMETERS, DEMO_EMPLOYEE } from './constants';
+import EmployeeView from './components/EmployeeView';
+import PayrollView from './components/PayrollView';
+import SettlementView from './components/SettlementView';
+import ParametersView from './components/ParametersView';
+import HistoryView from './components/HistoryView';
+import { calculatePayroll, calculateSettlement } from './services/payrollService';
+
+// Icons for navigation
+const UserGroupIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>;
+const DocumentTextIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>;
+const ArchiveIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" /></svg>;
+const CogIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924-1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.096 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>;
+const BriefcaseIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>;
+
+
+const App: React.FC = () => {
+  const [employees, setEmployees] = useLocalStorage<Employee[]>('employees', [DEMO_EMPLOYEE]);
+  const [payrolls, setPayrolls] = useLocalStorage<PayrollEntry[]>('payrolls', []);
+  const [settlements, setSettlements] = useLocalStorage<SettlementEntry[]>('settlements', []);
+  const [parameters, setParameters] = useLocalStorage<Parameter[]>('parameters', DEFAULT_PARAMETERS);
+  const [activeView, setActiveView] = useState<AppView>('employees');
+
+  const addEmployee = (employee: Omit<Employee, 'ID'>) => {
+    const newEmployee: Employee = { ...employee, ID: Date.now() };
+    setEmployees([...employees, newEmployee]);
+  };
+
+  const updateEmployee = (updatedEmployee: Employee) => {
+    setEmployees(employees.map(e => e.ID === updatedEmployee.ID ? updatedEmployee : e));
+  };
+  
+  const addPayroll = (payroll: Omit<PayrollEntry, 'ID_Mov' | 'Fecha_Registro'>) => {
+    const newPayroll: PayrollEntry = { 
+        ...payroll, 
+        ID_Mov: Date.now(),
+        Fecha_Registro: new Date().toISOString().split('T')[0]
+    };
+    setPayrolls([...payrolls, newPayroll]);
+  };
+
+  const addSettlement = (settlement: Omit<SettlementEntry, 'ID_Liq' | 'Fecha_Registro'>) => {
+    const newSettlement: SettlementEntry = {
+        ...settlement,
+        ID_Liq: Date.now(),
+        Fecha_Registro: new Date().toISOString().split('T')[0]
+    };
+    setSettlements([...settlements, newSettlement]);
+    // Mark employee as inactive
+    const employee = employees.find(e => e.ID === settlement.Empleado_ID);
+    if(employee) {
+        // FIX: Use EmployeeStatus enum for type safety instead of a magic string.
+        updateEmployee({...employee, Estado: EmployeeStatus.Inactivo, Fecha_Retiro: settlement.Fecha_Retiro});
+    }
+  };
+
+  const loadDemoData = useCallback(() => {
+    if (employees.some(e => e.ID === DEMO_EMPLOYEE.ID)) {
+      alert("El empleado demo ya existe.");
+      return;
+    }
+    setEmployees(prev => [...prev, DEMO_EMPLOYEE]);
+    alert("Empleado demo cargado.");
+  }, [employees, setEmployees]);
+
+  const generateDemoPayroll = useCallback(() => {
+    const demoEmployee = employees.find(e => e.ID === DEMO_EMPLOYEE.ID && e.Estado === 'Activo');
+    if (!demoEmployee) {
+      alert("Por favor, cargue el empleado demo primero (y asegúrese que esté activo).");
+      return;
+    }
+    const today = new Date();
+    const fifteenDaysAgo = new Date();
+    fifteenDaysAgo.setDate(today.getDate() - 15);
+
+    const periodFrom = fifteenDaysAgo.toISOString().split('T')[0];
+    const periodTo = today.toISOString().split('T')[0];
+    
+    const { results } = calculatePayroll(periodFrom, periodTo, [demoEmployee.ID], employees, parameters, {});
+    if (results.length > 0) {
+      const demoResult = results[0];
+      const newPayroll: Omit<PayrollEntry, 'ID_Mov'|'Fecha_Registro'> = {
+        Periodo_Desde: periodFrom,
+        Periodo_Hasta: periodTo,
+        Empleado_ID: demoResult.employee.ID,
+        Dias_Laborados: demoResult.diasLaborados,
+        Devengado_Salario: demoResult.devengadoSalario,
+        Devengado_Auxilio: demoResult.devengadoAuxilio,
+        Devengado_Otros: demoResult.devengadoOtros,
+        Deduccion_Salud: demoResult.deduccionSalud,
+        Deduccion_Pension: demoResult.deduccionPension,
+        Deduccion_FSP: demoResult.deduccionFSP,
+        Deduccion_Otros: demoResult.deduccionOtros,
+        Neto_Pagar: demoResult.netoPagar,
+        PDF_URL: '',
+        Observaciones: 'Nómina demo generada automáticamente.'
+      };
+      addPayroll(newPayroll);
+      alert("Nómina demo generada para los últimos 15 días.");
+      setActiveView('history');
+    } else {
+      alert("No se pudo calcular la nómina demo.");
+    }
+  }, [employees, parameters, addPayroll, setActiveView]);
+
+
+  // FIX: Change icon type from JSX.Element to React.ReactNode to avoid issues with JSX namespace resolution.
+  const NavItem: React.FC<{ view: AppView; label: string; icon: React.ReactNode; }> = ({ view, label, icon }) => (
+    <button
+      onClick={() => setActiveView(view)}
+      className={`flex flex-col items-center justify-center p-2 rounded-lg transition-colors duration-200 ${
+        activeView === view ? 'bg-secondary text-white' : 'hover:bg-neutral'
+      }`}
+    >
+      {icon}
+      <span className="text-xs mt-1">{label}</span>
+    </button>
+  );
+
+  return (
+    <div className="flex flex-col md:flex-row h-screen font-sans">
+      <nav className="w-full md:w-24 bg-neutral p-2 flex md:flex-col justify-around md:justify-start md:space-y-4 shadow-lg z-10">
+        <div className="flex flex-col items-center mb-6 hidden md:flex">
+          <BriefcaseIcon />
+          <h1 className="text-sm font-bold mt-1 text-center">Nómina 360</h1>
+        </div>
+        <NavItem view="employees" label="Empleados" icon={<UserGroupIcon />} />
+        <NavItem view="payroll" label="Nómina" icon={<DocumentTextIcon />} />
+        <NavItem view="settlement" label="Liquidación" icon={<BriefcaseIcon />} />
+        <NavItem view="history" label="Historial" icon={<ArchiveIcon />} />
+        <NavItem view="parameters" label="Parámetros" icon={<CogIcon />} />
+      </nav>
+
+      <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto bg-base-100">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl sm:text-3xl font-bold capitalize text-white">
+            {activeView === "employees" && "Gestión de Empleados"}
+            {activeView === "payroll" && "Proceso de Nómina"}
+            {activeView === "settlement" && "Liquidación de Contrato"}
+            {activeView === "history" && "Historial de Movimientos"}
+            {activeView === "parameters" && "Configuración de Parámetros"}
+          </h2>
+          <div className="flex items-center space-x-2">
+             <button onClick={loadDemoData} className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg text-sm transition-colors">
+                Cargar Empleado Demo
+             </button>
+             <button onClick={generateDemoPayroll} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-sm transition-colors">
+                Generar Nómina Demo
+             </button>
+          </div>
+        </div>
+        
+        <div className="bg-neutral p-4 sm:p-6 rounded-xl shadow-2xl">
+          {activeView === 'employees' && <EmployeeView employees={employees} onAdd={addEmployee} onUpdate={updateEmployee} />}
+          {activeView === 'payroll' && <PayrollView employees={employees} parameters={parameters} onRegister={addPayroll} />}
+          {activeView === 'settlement' && <SettlementView employees={employees} parameters={parameters} onRegister={addSettlement} />}
+          {activeView === 'history' && <HistoryView payrolls={payrolls} settlements={settlements} employees={employees} />}
+          {activeView === 'parameters' && <ParametersView parameters={parameters} setParameters={setParameters} />}
+        </div>
+      </main>
+    </div>
+  );
+};
+
+export default App;

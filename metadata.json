@@ -1,0 +1,5 @@
+{
+  "name": "Nómina & Liquidación 360",
+  "description": "A comprehensive application to manage payroll and employee settlements in Colombia. It handles employee management, periodic payroll processing, final settlements, and generates PDF receipts, with all parameters being fully configurable.",
+  "requestFramePermissions": []
+}
