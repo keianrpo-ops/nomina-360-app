@@ -2,8 +2,14 @@ import React, { useState } from "react";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import { PayrollEntry, SettlementEntry, Employee } from "../types";
 import { formatCurrency } from "../constants";
-import PayrollReceipt from "./common/pdf/PayrollReceipt";
-import SettlementReceipt from "./common/pdf/SettlementReceipt";
+
+// 👇 CAMBIA ESTO
+// import PayrollReceipt from "./common/pdf/PayrollReceipt";
+// import SettlementReceipt from "./common/pdf/SettlementReceipt";
+
+// 👇 POR ESTO (igual que en PayrollView)
+import PayrollReceipt from "./pdf/PayrollReceipt";
+import SettlementReceipt from "./pdf/SettlementReceipt";
 
 interface HistoryViewProps {
   payrolls: PayrollEntry[];
