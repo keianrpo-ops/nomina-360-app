@@ -8,8 +8,7 @@ export const SHEET_PARAMETERS = "Parametros";
 export const SHEET_PAYROLL = "Nominas";
 export const SHEET_SETTLEMENTS = "Liquidaciones";
 
-await fetchSheet(SHEET_EMPLOYEES);
-await addToSheet(SHEET_EMPLOYEES, nuevoEmpleado);
+
 
 export async function fetchSheet(sheet: string) {
   const res = await fetch(`${API_BASE}?sheet=${sheet}`);
@@ -25,6 +24,8 @@ export async function addToSheet(sheet: string, data: any) {
     body: JSON.stringify(data),
   });
 
+  await fetchSheet(SHEET_EMPLOYEES);
+await addToSheet(SHEET_EMPLOYEES, nuevoEmpleado);
   if (!res.ok) {
     throw new Error("Error al guardar datos en Google Sheets");
   }
