@@ -1,4 +1,5 @@
-// services/googleSheets.ts (o el nombre que uses)
+// services/googleSheets.ts
+
 const API_BASE =
   "https://script.google.com/macros/s/AKfycbzmipMDoUXfXvPzyDWOYGHHv4t6hHd3xGOgE6m40SEzLoZ7dgNW3dJtGuIKDGOi4fCY7A/exec";
 
@@ -33,9 +34,7 @@ export async function addToSheet(sheet: string, data: any) {
 
   const res = await fetch(url, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    // IMPORTANTE: sin headers personalizados para evitar CORS preflight
     body: JSON.stringify(data),
   });
 
@@ -46,7 +45,13 @@ export async function addToSheet(sheet: string, data: any) {
     throw new Error(`Error HTTP ${res.status}: ${text}`);
   }
 
-  const json = JSON.parse(text);
+  let json: any;
+  try {
+    json = JSON.parse(text);
+  } catch (e) {
+    console.error("Error parseando JSON en addToSheet:", e);
+    throw new Error("Respuesta no válida de Google Sheets");
+  }
 
   if (json.status !== "OK") {
     throw new Error(`Error en Apps Script: ${json.message || "Desconocido"}`);
