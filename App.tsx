@@ -85,12 +85,37 @@ const addEmployee = (employee: Omit<Employee, 'ID'>) => {
   };
   
   // ✅ Guardar nómina en localStorage + Google Sheets (Nomina)
-  const addPayroll = (payroll: Omit<PayrollEntry, 'ID_Mov' | 'Fecha_Registro'>) => {
-    const newPayroll: PayrollEntry = { 
-      ...payroll, 
-      ID_Mov: Date.now(),
-      Fecha_Registro: new Date().toISOString().split('T')[0]
-    };
+ const addPayroll = (payroll: Omit<PayrollEntry, 'ID_Mov' | 'Fecha_Registro'>) => {
+  const newPayroll: PayrollEntry = { 
+    ...payroll, 
+    ID_Mov: Date.now(),
+    Fecha_Registro: new Date().toISOString().split('T')[0]
+  };
+
+  setPayrolls([...payrolls, newPayroll]);
+
+  addToSheet(SHEET_PAYROLL, {
+    idMov: newPayroll.ID_Mov,
+    fechaRegistro: newPayroll.Fecha_Registro,
+    periodoDesde: newPayroll.Periodo_Desde,
+    periodoHasta: newPayroll.Periodo_Hasta,
+    empleadoId: newPayroll.Empleado_ID,
+    diasLaborados: newPayroll.Dias_Laborados,
+    devengadoSalario: newPayroll.Devengado_Salario,
+    devengadoAuxilio: newPayroll.Devengado_Auxilio,
+    devengadoOtros: newPayroll.Devengado_Otros,
+    deduccionSalud: newPayroll.Deduccion_Salud,
+    deduccionPension: newPayroll.Deduccion_Pension,
+    deduccionFsp: newPayroll.Deduccion_FSP,
+    deduccionOtros: newPayroll.Deduccion_Otros,
+    netoPagar: newPayroll.Neto_Pagar,
+    pdfUrl: newPayroll.PDF_URL,
+    observaciones: newPayroll.Observaciones,
+  }).catch((error) => {
+    console.error("Error al guardar nómina en Google Sheets:", error);
+    alert("La nómina se guardó en la app, pero hubo un error al guardar en Google Sheets.");
+  });
+};
 
     // 1) Guardar en la app
     setPayrolls([...payrolls, newPayroll]);
@@ -124,24 +149,44 @@ const addEmployee = (employee: Omit<Employee, 'ID'>) => {
 
   // ✅ Guardar liquidación en localStorage + Google Sheets (Liquidaciones)
   const addSettlement = (settlement: Omit<SettlementEntry, 'ID_Liq' | 'Fecha_Registro'>) => {
-    const newSettlement: SettlementEntry = {
-      ...settlement,
-      ID_Liq: Date.now(),
-      Fecha_Registro: new Date().toISOString().split('T')[0]
-    };
+  const newSettlement: SettlementEntry = {
+    ...settlement,
+    ID_Liq: Date.now(),
+    Fecha_Registro: new Date().toISOString().split('T')[0]
+  };
 
-    // 1) Guardar en la app
-    setSettlements([...settlements, newSettlement]);
+  setSettlements([...settlements, newSettlement]);
 
-    // 2) Marcar empleado como inactivo
-    const employee = employees.find(e => e.ID === settlement.Empleado_ID);
-    if (employee) {
-      updateEmployee({
-        ...employee,
-        Estado: EmployeeStatus.Inactivo,
-        Fecha_Retiro: settlement.Fecha_Retiro
-      });
-    }
+  const employee = employees.find(e => e.ID === settlement.Empleado_ID);
+  if (employee) {
+    updateEmployee({
+      ...employee,
+      Estado: EmployeeStatus.Inactivo,
+      Fecha_Retiro: settlement.Fecha_Retiro
+    });
+  }
+
+  addToSheet(SHEET_SETTLEMENTS, {
+    idLiq: newSettlement.ID_Liq,
+    fechaRegistro: newSettlement.Fecha_Registro,
+    empleadoId: newSettlement.Empleado_ID,
+    fechaIngreso: newSettlement.Fecha_Ingreso,
+    fechaRetiro: newSettlement.Fecha_Retiro,
+    diasAntiguedad: newSettlement.Dias_Antiguedad,
+    cesantias: newSettlement.Cesantias,
+    interesesCesantias: newSettlement.Intereses_Cesantias,
+    prima: newSettlement.Prima,
+    vacaciones: newSettlement.Vacaciones,
+    otrosConceptos: newSettlement.Otros_Conceptos,
+    deducciones: newSettlement.Deducciones,
+    totalLiquidacion: newSettlement.Total_Liquidacion,
+    pdfUrl: newSettlement.PDF_URL,
+    observaciones: newSettlement.Observaciones,
+  }).catch((error) => {
+    console.error("Error al guardar liquidación en Google Sheets:", error);
+    alert("La liquidación se guardó en la app, pero hubo un error al guardar en Google Sheets.");
+  });
+};
 
     // 3) Guardar en Google Sheets
     addToSheet("Liquidaciones", {
