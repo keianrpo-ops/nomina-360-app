@@ -28,21 +28,30 @@ const App: React.FC = () => {
 
   // 🔹 Botón de prueba (lo dejamos activo porque ya viste que funciona)
   const probarConexion = async () => {
-    try {
-      await addToSheet("Empleados", {
-        id: Date.now(),
-        nombre: "Empleado desde la app",
-        cedula: "999999999",
-        cargo: "Prueba conexión",
-        salario: 1234567,
-        fcha_ingreso: new Date().toISOString().slice(0, 10),
-      });
-      alert("✅ Se guardó un empleado de prueba en Google Sheets");
-    } catch (error) {
-      console.error(error);
-      alert("❌ Error al guardar en Google Sheets. Revisa la consola del navegador.");
-    }
-  };
+  try {
+    await addToSheet(SHEET_EMPLOYEES, {
+      id: Date.now(),
+      cedula: "999999999",
+      nombres: "Empleado",
+      apellidos: "Prueba",
+      cargo: "Prueba conexión",
+      fechaIngreso: new Date().toISOString().slice(0, 10),
+      tipoContrato: "Indefinido",
+      tipoSueldo: "Básico",
+      salarioBase: 1234567,
+      auxTransporte: 0,
+      correo: "demo@empresa.com",
+      estado: "Activo",
+      fechaRetiro: "",
+      foto: "",
+    });
+
+    alert("✅ Se guardó un empleado de prueba en Google Sheets");
+  } catch (error) {
+    console.error(error);
+    alert("❌ Error al guardar en Google Sheets. Revisa la consola del navegador.");
+  }
+};
 
   // ✅ Guardar empleado en localStorage + Google Sheets (Empleados)
   const addEmployee = (employee: Omit<Employee, 'ID'>) => {
