@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
+import { PDFDownloadLink } from '@react-pdf/renderer';
 import { PayrollEntry, SettlementEntry, Employee } from '../types';
 import { formatCurrency } from '../constants';
+import PayrollReceipt from './common/pdf/PayrollReceipt';
+import SettlementReceipt from './common/pdf/SettlementReceipt';
 
 interface HistoryViewProps {
   payrolls: PayrollEntry[];
@@ -11,10 +14,7 @@ interface HistoryViewProps {
 const HistoryView: React.FC<HistoryViewProps> = ({ payrolls, settlements, employees }) => {
   const [activeTab, setActiveTab] = useState<'payroll' | 'settlement'>('payroll');
 
-  const getEmployeeName = (id: number) => {
-    const emp = employees.find(e => e.ID === id);
-    return emp ? `${emp.Nombres} ${emp.Apellidos}` : 'Empleado no encontrado';
-  };
+  const getEmployee = (id: number) => employees.find(e => e.ID === id);
 
   return (
     <div>
@@ -57,34 +57,38 @@ const HistoryView: React.FC<HistoryViewProps> = ({ payrolls, settlements, employ
             <tbody>
               {payrolls
                 .sort((a, b) => b.ID_Mov - a.ID_Mov)
-                .map(p => (
-                  <tr
-                    key={p.ID_Mov}
-                    className="bg-gray-800 border-b border-gray-700 hover:bg-gray-600"
-                  >
-                    <td className="px-6 py-4">{p.Fecha_Registro}</td>
-                    <td className="px-6 py-4">
-                      {p.Periodo_Desde} al {p.Periodo_Hasta}
-                    </td>
-                    <td className="px-6 py-4">{getEmployeeName(p.Empleado_ID)}</td>
-                    <td className="px-6 py-4">{formatCurrency(p.Neto_Pagar)}</td>
-                    <td className="px-6 py-4">{p.Observaciones}</td>
-                    <td className="px-6 py-4">
-                      {p.PDF_URL ? (
-                        <a
-                          href={p.PDF_URL}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-accent hover:underline"
-                        >
-                          Ver / Descargar
-                        </a>
-                      ) : (
-                        <span className="text-gray-500">Sin PDF</span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
+                .map(p => {
+                  const emp = getEmployee(p.Empleado_ID);
+                  return (
+                    <tr
+                      key={p.ID_Mov}
+                      className="bg-gray-800 border-b border-gray-700 hover:bg-gray-600"
+                    >
+                      <td className="px-6 py-4">{p.Fecha_Registro}</td>
+                      <td className="px-6 py-4">
+                        {p.Periodo_Desde} al {p.Periodo_Hasta}
+                      </td>
+                      <td className="px-6 py-4">
+                        {emp ? `${emp.Nombres} ${emp.Apellidos}` : 'Empleado no encontrado'}
+                      </td>
+                      <td className="px-6 py-4">{formatCurrency(p.Neto_Pagar)}</td>
+                      <td className="px-6 py-4">{p.Observaciones}</td>
+                      <td className="px-6 py-4">
+                        {emp ? (
+                          <PDFDownloadLink
+                            document={<PayrollReceipt employee={emp} payroll={p} />}
+                            fileName={`nomina-${emp.Cedula}-${p.Periodo_Hasta}.pdf`}
+                            className="text-accent hover:underline"
+                          >
+                            {({ loading }) => (loading ? 'Generando…' : 'Ver / Descargar')}
+                          </PDFDownloadLink>
+                        ) : (
+                          <span className="text-gray-500">Sin datos</span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
             </tbody>
           </table>
         )}
@@ -104,34 +108,38 @@ const HistoryView: React.FC<HistoryViewProps> = ({ payrolls, settlements, employ
             <tbody>
               {settlements
                 .sort((a, b) => b.ID_Liq - a.ID_Liq)
-                .map(s => (
-                  <tr
-                    key={s.ID_Liq}
-                    className="bg-gray-800 border-b border-gray-700 hover:bg-gray-600"
-                  >
-                    <td className="px-6 py-4">{s.Fecha_Registro}</td>
-                    <td className="px-6 py-4">{getEmployeeName(s.Empleado_ID)}</td>
-                    <td className="px-6 py-4">{s.Fecha_Retiro}</td>
-                    <td className="px-6 py-4">
-                      {formatCurrency(s.Total_Liquidacion)}
-                    </td>
-                    <td className="px-6 py-4">{s.Observaciones}</td>
-                    <td className="px-6 py-4">
-                      {s.PDF_URL ? (
-                        <a
-                          href={s.PDF_URL}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-accent hover:underline"
-                        >
-                          Ver / Descargar
-                        </a>
-                      ) : (
-                        <span className="text-gray-500">Sin PDF</span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
+                .map(s => {
+                  const emp = getEmployee(s.Empleado_ID);
+                  return (
+                    <tr
+                      key={s.ID_Liq}
+                      className="bg-gray-800 border-b border-gray-700 hover:bg-gray-600"
+                    >
+                      <td className="px-6 py-4">{s.Fecha_Registro}</td>
+                      <td className="px-6 py-4">
+                        {emp ? `${emp.Nombres} ${emp.Apellidos}` : 'Empleado no encontrado'}
+                      </td>
+                      <td className="px-6 py-4">{s.Fecha_Retiro}</td>
+                      <td className="px-6 py-4">
+                        {formatCurrency(s.Total_Liquidacion)}
+                      </td>
+                      <td className="px-6 py-4">{s.Observaciones}</td>
+                      <td className="px-6 py-4">
+                        {emp ? (
+                          <PDFDownloadLink
+                            document={<SettlementReceipt employee={emp} settlement={s} />}
+                            fileName={`liquidacion-${emp.Cedula}-${s.Fecha_Retiro}.pdf`}
+                            className="text-accent hover:underline"
+                          >
+                            {({ loading }) => (loading ? 'Generando…' : 'Ver / Descargar')}
+                          </PDFDownloadLink>
+                        ) : (
+                          <span className="text-gray-500">Sin datos</span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
             </tbody>
           </table>
         )}
