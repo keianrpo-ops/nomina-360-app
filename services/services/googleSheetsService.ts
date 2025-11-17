@@ -24,6 +24,9 @@ export async function addToSheet(sheet: string, data: any) {
     body: JSON.stringify(data),
   });
 
+  await fetchSheet(SHEET_EMPLOYEES);
+  await addToSheet(SHEET_EMPLOYEES, nuevoEmpleado);
+  
   if (!res.ok) {
     throw new Error("Error al guardar datos en Google Sheets");
   }
