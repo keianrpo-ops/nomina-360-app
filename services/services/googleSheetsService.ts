@@ -1,21 +1,27 @@
 // services/googleSheets.ts
 
+// 👇 URL del deployment de tu Apps Script (ya con tu ID correcto)
 const API_BASE =
   "https://script.google.com/macros/s/AKfycbzjvt0fxC1GJqzCjmvY5uA4kZvFVeb_g4RwnzKRu4Z2jv4TG_AAQbIf_vGOCdQ1CalhQw/exec";
 
-
-// Nombres EXACTOS de las pestañas en tu Google Sheets
+// 👇 NOMBRES EXACTOS de las pestañas en tu archivo de Google Sheets
 export const SHEET_EMPLOYEES   = "Empleados";
 export const SHEET_PARAMETERS  = "Parametros";
 export const SHEET_PAYROLL     = "Nominas";
 export const SHEET_SETTLEMENTS = "Liquidaciones";
 
+/**
+ * Lee datos de una hoja de Google Sheets
+ */
 export async function fetchSheet(sheet: string) {
   const url = `${API_BASE}?sheet=${encodeURIComponent(sheet)}`;
-  const res = await fetch(url);
 
+  console.log("[fetchSheet] URL:", url);
+
+  const res = await fetch(url);
   const text = await res.text();
-  console.log("[fetchSheet] respuesta Google:", text);
+
+  console.log("[fetchSheet] respuesta Google (raw):", text);
 
   if (!res.ok) {
     throw new Error(`Error HTTP ${res.status}: ${text}`);
@@ -25,22 +31,29 @@ export async function fetchSheet(sheet: string) {
     const json = JSON.parse(text);
     return json;
   } catch (e) {
-    console.error("Error parseando JSON de Google Sheets:", e);
-    throw e;
+    console.error("Error parseando JSON de Google Sheets en fetchSheet:", e);
+    throw new Error("Respuesta no válida de Google Sheets (fetchSheet)");
   }
 }
 
+/**
+ * Agrega un registro a una hoja de Google Sheets
+ * IMPORTANTE: sin headers personalizados para evitar preflight CORS
+ */
 export async function addToSheet(sheet: string, data: any) {
   const url = `${API_BASE}?sheet=${encodeURIComponent(sheet)}`;
 
+  console.log("[addToSheet] URL:", url);
+  console.log("[addToSheet] payload:", data);
+
   const res = await fetch(url, {
     method: "POST",
-    // IMPORTANTE: sin headers personalizados para evitar CORS preflight
+    // 👇 Sin headers para que sea un "simple request" y evitar problemas de CORS
     body: JSON.stringify(data),
   });
 
   const text = await res.text();
-  console.log("[addToSheet] respuesta Google:", text);
+  console.log("[addToSheet] respuesta Google (raw):", text);
 
   if (!res.ok) {
     throw new Error(`Error HTTP ${res.status}: ${text}`);
@@ -50,8 +63,8 @@ export async function addToSheet(sheet: string, data: any) {
   try {
     json = JSON.parse(text);
   } catch (e) {
-    console.error("Error parseando JSON en addToSheet:", e);
-    throw new Error("Respuesta no válida de Google Sheets");
+    console.error("Error parseando JSON de Google Sheets en addToSheet:", e);
+    throw new Error("Respuesta no válida de Google Sheets (addToSheet)");
   }
 
   if (json.status !== "OK") {
