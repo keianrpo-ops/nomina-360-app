@@ -16,8 +16,14 @@ export default defineConfig(({ mode }) => {
       },
       resolve: {
         alias: {
-          '@': path.resolve(__dirname, '.'),
+          // Fix: __dirname is not available in an ES module context. `process.cwd()` resolves to the project root.
+          '@': path.resolve(process.cwd(), '.'),
         }
-      }
+      },
+      build: {
+        rollupOptions: {
+          external: ['@react-pdf/renderer'],
+        },
+      },
     };
 });
