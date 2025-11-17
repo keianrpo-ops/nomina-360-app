@@ -1,6 +1,16 @@
 const API_BASE = "https://script.google.com/macros/s/AKfycbzmipMDoUXfXvPzyDWOYGHHv4t6hHd3xGOgE6m40SEzLoZ7dgNW3dJtGuIKDGOi4fCY7A/exec"; 
 // Ejemplo: "https://script.google.com/macros/s/AKfxxxx/exec"
 
+// services/sheets.ts (o donde tengas fetchSheet/addToSheet)
+
+export const SHEET_EMPLOYEES = "Empleados";
+export const SHEET_PARAMETERS = "Parametros";
+export const SHEET_PAYROLL = "Nominas";
+export const SHEET_SETTLEMENTS = "Liquidaciones";
+
+await fetchSheet(SHEET_EMPLOYEES);
+await addToSheet(SHEET_EMPLOYEES, nuevoEmpleado);
+
 export async function fetchSheet(sheet: string) {
   const res = await fetch(`${API_BASE}?sheet=${sheet}`);
   if (!res.ok) {
