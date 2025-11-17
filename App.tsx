@@ -54,25 +54,31 @@ const App: React.FC = () => {
 };
 
   // ✅ Guardar empleado en localStorage + Google Sheets (Empleados)
-  const addEmployee = (employee: Omit<Employee, 'ID'>) => {
-    const newEmployee: Employee = { ...employee, ID: Date.now() };
+const addEmployee = (employee: Omit<Employee, 'ID'>) => {
+  const newEmployee: Employee = { ...employee, ID: Date.now() };
 
-    // 1) Guardar en la app
-    setEmployees([...employees, newEmployee]);
+  setEmployees([...employees, newEmployee]);
 
-    // 2) Guardar en Google Sheets
-    addToSheet("Empleados", {
-      id: newEmployee.ID,
-      nombre: `${newEmployee.Nombres} ${newEmployee.Apellidos}`,
-      cedula: newEmployee.Cedula,
-      cargo: newEmployee.Cargo,
-      salario: newEmployee.Salario_Base,
-      fcha_ingreso: newEmployee.Fecha_Ingreso,
-    }).catch((error) => {
-      console.error("Error al guardar empleado en Google Sheets:", error);
-      alert("El empleado se guardó en la app, pero hubo un error al guardar en Google Sheets.");
-    });
-  };
+  addToSheet(SHEET_EMPLOYEES, {
+    id: newEmployee.ID,
+    cedula: newEmployee.Cedula,
+    nombres: newEmployee.Nombres,
+    apellidos: newEmployee.Apellidos,
+    cargo: newEmployee.Cargo,
+    fechaIngreso: newEmployee.Fecha_Ingreso,
+    tipoContrato: newEmployee.Tipo_Contrato,
+    tipoSueldo: newEmployee.Tipo_Sueldo,
+    salarioBase: newEmployee.Salario_Base,
+    auxTransporte: newEmployee.Aux_Transporte,
+    correo: newEmployee.Correo,
+    estado: newEmployee.Estado,
+    fechaRetiro: newEmployee.Fecha_Retiro || "",
+    foto: newEmployee.Foto || "",
+  }).catch((error) => {
+    console.error("Error al guardar empleado en Google Sheets:", error);
+    alert("El empleado se guardó en la app, pero hubo un error al guardar en Google Sheets.");
+  });
+};
 
   const updateEmployee = (updatedEmployee: Employee) => {
     setEmployees(employees.map(e => e.ID === updatedEmployee.ID ? updatedEmployee : e));
