@@ -1,7 +1,7 @@
 // services/googleSheets.ts
 
 const API_BASE =
-  "https://script.google.com/macros/s/AKfycbzdpgjeVGlpTlS9_68ttyiKQZc38r6I2nkQissjS5FfJUPdIlcIb16m9T6zOZdb1yhOig/exec";
+  "https://script.google.com/macros/s/AKfycbzjvt0fxC1GJqzCjmvY5uA4kZvFVeb_g4RwnzKRu4Z2jv4TG_AAQbIf_vGOCdQ1CalhQw/exec";
 
 
 // Nombres EXACTOS de las pestañas en tu Google Sheets
