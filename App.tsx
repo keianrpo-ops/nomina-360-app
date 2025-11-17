@@ -148,24 +148,28 @@ const addEmployee = (employee: Omit<Employee, 'ID'>) => {
   };
 
   // ✅ Guardar liquidación en localStorage + Google Sheets (Liquidaciones)
-  const addSettlement = (settlement: Omit<SettlementEntry, 'ID_Liq' | 'Fecha_Registro'>) => {
+// ✅ Guardar liquidación en localStorage + Google Sheets (Liquidaciones)
+const addSettlement = (settlement: Omit<SettlementEntry, 'ID_Liq' | 'Fecha_Registro'>) => {
   const newSettlement: SettlementEntry = {
     ...settlement,
     ID_Liq: Date.now(),
-    Fecha_Registro: new Date().toISOString().split('T')[0]
+    Fecha_Registro: new Date().toISOString().split('T')[0],
   };
 
+  // 1) Guardar en la app
   setSettlements([...settlements, newSettlement]);
 
+  // 2) Marcar empleado como inactivo
   const employee = employees.find(e => e.ID === settlement.Empleado_ID);
   if (employee) {
     updateEmployee({
       ...employee,
       Estado: EmployeeStatus.Inactivo,
-      Fecha_Retiro: settlement.Fecha_Retiro
+      Fecha_Retiro: settlement.Fecha_Retiro,
     });
   }
 
+  // 3) Guardar en Google Sheets
   addToSheet(SHEET_SETTLEMENTS, {
     idLiq: newSettlement.ID_Liq,
     fechaRegistro: newSettlement.Fecha_Registro,
@@ -188,27 +192,6 @@ const addEmployee = (employee: Omit<Employee, 'ID'>) => {
   });
 };
 
-    // 3) Guardar en Google Sheets
-    addToSheet("Liquidaciones", {
-      id_liq: newSettlement.ID_Liq,
-      fecha_registro: newSettlement.Fecha_Registro,
-      empleado_id: newSettlement.Empleado_ID,
-      empleado_nombre: employee ? `${employee.Nombres} ${employee.Apellidos}` : "",
-      fecha_ingreso: employee ? employee.Fecha_Ingreso : "",
-      fecha_retiro: newSettlement.Fecha_Retiro,
-      cesantias: newSettlement.Cesantias,
-      intereses_cesantias: newSettlement.Intereses_Cesantias,
-      primas: newSettlement.Primas,
-      vacaciones: newSettlement.Vacaciones,
-      otros_conceptos: newSettlement.Otros_Conceptos,
-      deducciones: newSettlement.Deducciones,
-      total_pagar: newSettlement.Total_Pagar,
-      pdf_url: newSettlement.PDF_URL,
-    }).catch((error) => {
-      console.error("Error al guardar liquidación en Google Sheets:", error);
-      alert("La liquidación se guardó en la app, pero hubo un error al guardar en Google Sheets.");
-    });
-  };
 
   const loadDemoData = useCallback(() => {
     if (employees.some(e => e.ID === DEMO_EMPLOYEE.ID)) {
