@@ -1,11 +1,3 @@
-import React, { useState } from 'react';
-import { PDFDownloadLink } from '@react-pdf/renderer';
-import { PayrollEntry, SettlementEntry, Employee } from '../types';
-import { formatCurrency } from '../constants';
-import PayrollReceipt from './common/pdf/PayrollReceipt';
-import SettlementReceipt from './common/pdf/SettlementReceipt';
-
-
 import React from 'react';
 
 // This is a placeholder component to resolve a build error from an old, unused file.
@@ -15,6 +7,16 @@ const HistoryView: React.FC = () => {
 };
 
 export default HistoryView;
+
+import React, { useState } from 'react';
+import { PDFDownloadLink } from '@react-pdf/renderer';
+import { PayrollEntry, SettlementEntry, Employee } from '../types';
+import { formatCurrency } from '../constants';
+import PayrollReceipt from './common/pdf/PayrollReceipt';
+import SettlementReceipt from './common/pdf/SettlementReceipt';
+
+
+
 
 interface HistoryViewProps {
   payrolls: PayrollEntry[];
