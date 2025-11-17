@@ -8,7 +8,7 @@ import PayrollView from './components/PayrollView';
 import SettlementView from './components/SettlementView';
 import ParametersView from './components/ParametersView';
 import HistoryView from './components/HistoryView';
-import { calculatePayroll, calculateSettlement } from './services/payrollService';
+import { calculatePayroll } from './services/payrollService';
 import { addToSheet } from "./services/services/googleSheetsService";
 
 // Icons for navigation
@@ -25,7 +25,7 @@ const App: React.FC = () => {
   const [parameters, setParameters] = useLocalStorage<Parameter[]>('parameters', DEFAULT_PARAMETERS);
   const [activeView, setActiveView] = useState<AppView>('employees');
 
-  // 🔹 Prueba de conexión con Google Sheets
+  // 🔹 Botón de prueba (lo dejamos activo porque ya viste que funciona)
   const probarConexion = async () => {
     try {
       await addToSheet("Empleados", {
@@ -34,7 +34,7 @@ const App: React.FC = () => {
         cedula: "999999999",
         cargo: "Prueba conexión",
         salario: 1234567,
-        fecha_ingreso: new Date().toISOString().slice(0, 10), // YYYY-MM-DD
+        fcha_ingreso: new Date().toISOString().slice(0, 10),
       });
       alert("✅ Se guardó un empleado de prueba en Google Sheets");
     } catch (error) {
@@ -43,37 +43,110 @@ const App: React.FC = () => {
     }
   };
 
+  // ✅ Guardar empleado en localStorage + Google Sheets (Empleados)
   const addEmployee = (employee: Omit<Employee, 'ID'>) => {
     const newEmployee: Employee = { ...employee, ID: Date.now() };
+
+    // 1) Guardar en la app
     setEmployees([...employees, newEmployee]);
+
+    // 2) Guardar en Google Sheets
+    addToSheet("Empleados", {
+      id: newEmployee.ID,
+      nombre: `${newEmployee.Nombres} ${newEmployee.Apellidos}`,
+      cedula: newEmployee.Cedula,
+      cargo: newEmployee.Cargo,
+      salario: newEmployee.Salario_Base,
+      fcha_ingreso: newEmployee.Fecha_Ingreso,
+    }).catch((error) => {
+      console.error("Error al guardar empleado en Google Sheets:", error);
+      alert("El empleado se guardó en la app, pero hubo un error al guardar en Google Sheets.");
+    });
   };
 
   const updateEmployee = (updatedEmployee: Employee) => {
     setEmployees(employees.map(e => e.ID === updatedEmployee.ID ? updatedEmployee : e));
   };
   
+  // ✅ Guardar nómina en localStorage + Google Sheets (Nomina)
   const addPayroll = (payroll: Omit<PayrollEntry, 'ID_Mov' | 'Fecha_Registro'>) => {
     const newPayroll: PayrollEntry = { 
-        ...payroll, 
-        ID_Mov: Date.now(),
-        Fecha_Registro: new Date().toISOString().split('T')[0]
+      ...payroll, 
+      ID_Mov: Date.now(),
+      Fecha_Registro: new Date().toISOString().split('T')[0]
     };
+
+    // 1) Guardar en la app
     setPayrolls([...payrolls, newPayroll]);
+
+    // 2) Buscar empleado para el nombre
+    const empleado = employees.find(e => e.ID === newPayroll.Empleado_ID);
+
+    // 3) Guardar en Google Sheets
+    addToSheet("Nomina", {
+      id_mov: newPayroll.ID_Mov,
+      fecha_registro: newPayroll.Fecha_Registro,
+      periodo_desde: newPayroll.Periodo_Desde,
+      periodo_hasta: newPayroll.Periodo_Hasta,
+      empleado_id: newPayroll.Empleado_ID,
+      empleado_nombre: empleado ? `${empleado.Nombres} ${empleado.Apellidos}` : "",
+      devengado_salario: newPayroll.Devengado_Salario,
+      devengado_auxilio: newPayroll.Devengado_Auxilio,
+      devengado_otros: newPayroll.Devengado_Otros,
+      deduccion_salud: newPayroll.Deduccion_Salud,
+      deduccion_pension: newPayroll.Deduccion_Pension,
+      deduccion_fsp: newPayroll.Deduccion_FSP,
+      deduccion_otros: newPayroll.Deduccion_Otros,
+      neto_pagar: newPayroll.Neto_Pagar,
+      observaciones: newPayroll.Observaciones,
+      pdf_url: newPayroll.PDF_URL,
+    }).catch((error) => {
+      console.error("Error al guardar nómina en Google Sheets:", error);
+      alert("La nómina se guardó en la app, pero hubo un error al guardar en Google Sheets.");
+    });
   };
 
+  // ✅ Guardar liquidación en localStorage + Google Sheets (Liquidaciones)
   const addSettlement = (settlement: Omit<SettlementEntry, 'ID_Liq' | 'Fecha_Registro'>) => {
     const newSettlement: SettlementEntry = {
-        ...settlement,
-        ID_Liq: Date.now(),
-        Fecha_Registro: new Date().toISOString().split('T')[0]
+      ...settlement,
+      ID_Liq: Date.now(),
+      Fecha_Registro: new Date().toISOString().split('T')[0]
     };
+
+    // 1) Guardar en la app
     setSettlements([...settlements, newSettlement]);
-    // Mark employee as inactive
+
+    // 2) Marcar empleado como inactivo
     const employee = employees.find(e => e.ID === settlement.Empleado_ID);
-    if(employee) {
-        // FIX: Use EmployeeStatus enum for type safety instead of a magic string.
-        updateEmployee({...employee, Estado: EmployeeStatus.Inactivo, Fecha_Retiro: settlement.Fecha_Retiro});
+    if (employee) {
+      updateEmployee({
+        ...employee,
+        Estado: EmployeeStatus.Inactivo,
+        Fecha_Retiro: settlement.Fecha_Retiro
+      });
     }
+
+    // 3) Guardar en Google Sheets
+    addToSheet("Liquidaciones", {
+      id_liq: newSettlement.ID_Liq,
+      fecha_registro: newSettlement.Fecha_Registro,
+      empleado_id: newSettlement.Empleado_ID,
+      empleado_nombre: employee ? `${employee.Nombres} ${employee.Apellidos}` : "",
+      fecha_ingreso: employee ? employee.Fecha_Ingreso : "",
+      fecha_retiro: newSettlement.Fecha_Retiro,
+      cesantias: newSettlement.Cesantias,
+      intereses_cesantias: newSettlement.Intereses_Cesantias,
+      primas: newSettlement.Primas,
+      vacaciones: newSettlement.Vacaciones,
+      otros_conceptos: newSettlement.Otros_Conceptos,
+      deducciones: newSettlement.Deducciones,
+      total_pagar: newSettlement.Total_Pagar,
+      pdf_url: newSettlement.PDF_URL,
+    }).catch((error) => {
+      console.error("Error al guardar liquidación en Google Sheets:", error);
+      alert("La liquidación se guardó en la app, pero hubo un error al guardar en Google Sheets.");
+    });
   };
 
   const loadDemoData = useCallback(() => {
@@ -125,7 +198,6 @@ const App: React.FC = () => {
     }
   }, [employees, parameters, addPayroll, setActiveView]);
 
-  // FIX: Change icon type from JSX.Element to React.ReactNode to avoid issues with JSX namespace resolution.
   const NavItem: React.FC<{ view: AppView; label: string; icon: React.ReactNode; }> = ({ view, label, icon }) => (
     <button
       onClick={() => setActiveView(view)}
@@ -174,7 +246,6 @@ const App: React.FC = () => {
             >
               Generar Nómina Demo
             </button>
-            {/* Botón de prueba de conexión con Google Sheets */}
             <button
               onClick={probarConexion}
               className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg text-sm transition-colors"
