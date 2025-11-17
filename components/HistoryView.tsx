@@ -5,6 +5,17 @@ import { formatCurrency } from '../constants';
 import PayrollReceipt from './common/pdf/PayrollReceipt';
 import SettlementReceipt from './common/pdf/SettlementReceipt';
 
+
+import React from 'react';
+
+// This is a placeholder component to resolve a build error from an old, unused file.
+// The main functionality is now handled by HistoryTable.tsx.
+const HistoryView: React.FC = () => {
+  return null; // Render nothing
+};
+
+export default HistoryView;
+
 interface HistoryViewProps {
   payrolls: PayrollEntry[];
   settlements: SettlementEntry[];
