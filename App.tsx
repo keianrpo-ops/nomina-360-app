@@ -22,8 +22,7 @@ import {
   SHEET_SETTLEMENTS,
 } from './services/services/googleSheetsService';
 
-// 👇 NUEVO IMPORT
-import macawLogo from './src/assets/macaw-logo-3d.png';
+
 
 
 
