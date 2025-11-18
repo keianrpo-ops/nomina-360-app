@@ -41,3 +41,10 @@ export const formatCurrency = (value: number): string => {
     maximumFractionDigits: 0,
   }).format(value);
 };
+
+// 🔹 Info fija de la empresa
+export const COMPANY_INFO = {
+  name: 'EcoParadise',
+  nit: '901891752',
+  address: 'Pereira, Colombia',
+};
