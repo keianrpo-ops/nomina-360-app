@@ -23,7 +23,9 @@ import {
 } from './services/services/googleSheetsService';
 
 // 👇 NUEVO IMPORT
-import macawLogo from './assets/macaw-logo.png';
+import macawLogo from './src/assets/macaw-logo-3d.png';
+
+
 
 
 // 🔹 Helper: NO guardar la foto en localStorage (solo en Sheets)
