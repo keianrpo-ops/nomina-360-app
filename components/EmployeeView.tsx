@@ -81,7 +81,7 @@ const EmployeeForm: React.FC<{
   }, [employeeToEdit]);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -103,7 +103,7 @@ const EmployeeForm: React.FC<{
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // ✅ Foto OBLIGATORIA (tanto crear como editar)
+    // ✅ Foto OBLIGATORIA (crear y editar)
     if (!formData.Foto || formData.Foto === '') {
       alert('Por favor selecciona una foto para este empleado.');
       return;
@@ -300,7 +300,7 @@ const EmployeeForm: React.FC<{
               className={inputClass}
             />
             <p className="text-xs text-gray-400 mt-1">
-              La imagen se guarda en la base de datos como Base64 y se envía a Google Sheets.
+              La imagen se guarda en Base64 y se envía también a Google Sheets.
             </p>
           </div>
 
