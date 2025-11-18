@@ -1,4 +1,6 @@
-/* ===== PALETA MACAW HOTEL ===== */
+/* =========================================
+   PALETA MACAW HOTEL
+   ========================================= */
 :root {
   --color-bg-main: #051821;       /* fondo general profundo */
   --color-bg-card: #0c2733;       /* paneles / tarjetas */
@@ -10,7 +12,7 @@
   --color-border-soft: rgba(255, 255, 255, 0.08);
 }
 
-/* Fondo general de la app */
+/* ===== Fondo general de la app ===== */
 body {
   margin: 0;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -18,33 +20,60 @@ body {
   color: var(--color-text-main);
 }
 
-/* Panel central (donde está la tabla) */
+/* Contenedor principal (bg-base-100 en tu código) */
 .bg-base-100 {
   background-color: var(--color-bg-main) !important;
 }
 
-/* Tarjeta grande gris oscura */
+/* Tarjeta grande gris oscura (donde está la tabla, sidebar header, etc.) */
 .bg-neutral {
   background: linear-gradient(145deg, #061f2b, #0d313f) !important;
   border-radius: 18px;
   border: 1px solid var(--color-border-soft);
 }
 
-/* Sidebar */
+/* ======= Sidebar ======= */
 nav {
   background: #021219 !important;
 }
 
-/* Botones principales (verde/azul actuales) */
-.bg-primary {
-  background: var(--color-accent) !important;
+/* Icono activo del sidebar (círculo amarillo) ya viene del tema,
+   solo afinamos un poco el contraste si se usa bg-yellow-400 */
+.bg-yellow-400,
+.bg-yellow-500 {
+  background-color: var(--color-accent-yellow) !important;
+  color: #08202b !important;
 }
 
+/* ======= Botones principales de arriba =======
+   (Cargar Empleado Demo, Generar Nómina Demo, Probar conexión...) */
+
+/* Cualquier botón verde (bg-green-600 / hover:bg-green-700) */
+.bg-green-600,
+.hover\:bg-green-700:hover {
+  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-soft)) !important;
+  border-radius: 999px !important;
+  border: none !important;
+}
+
+/* Botones azules y morados (bg-blue-600, bg-purple-600, etc.) */
+.bg-blue-600,
+.bg-purple-600,
+.hover\:bg-blue-700:hover,
+.hover\:bg-purple-700:hover {
+  background: linear-gradient(135deg, var(--color-accent-soft), var(--color-accent)) !important;
+  border-radius: 999px !important;
+  border: none !important;
+}
+
+/* Unificamos estilo del botón “+ Agregar Empleado” (bg-primary / bg-secondary si se usan) */
+.bg-primary {
+  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-soft)) !important;
+}
 .bg-primary:hover {
   background: var(--color-accent-soft) !important;
 }
 
-/* Botones secundarios (por ej. “Generar nómina demo”) */
 .bg-secondary {
   background: var(--color-accent-yellow) !important;
   color: #08202b !important;
@@ -53,7 +82,46 @@ nav {
   filter: brightness(1.05);
 }
 
-/* Pills de ESTADO Activo / Inactivo */
+/* Sombra suave para todos los botones “importantes” */
+button.bg-green-600,
+button.bg-blue-600,
+button.bg-purple-600,
+button.bg-primary,
+button.bg-secondary {
+  box-shadow: 0 10px 25px rgba(0, 150, 214, 0.35);
+}
+
+/* ======= Tabla de empleados ======= */
+
+/* Encabezado de la tabla */
+thead.bg-gray-700,
+.bg-gray-700 {
+  background: rgba(3, 32, 45, 0.95) !important;
+  border-bottom: 1px solid var(--color-border-soft);
+}
+
+/* Filas de la tabla */
+.bg-gray-800 {
+  background-color: var(--color-bg-card) !important;
+}
+.border-gray-700 {
+  border-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+/* Hover de las filas (hover:bg-gray-600) */
+.hover\:bg-gray-600:hover {
+  background: rgba(4, 52, 71, 0.85) !important;
+}
+
+/* Texto gris de la tabla */
+.text-gray-400 {
+  color: var(--color-text-muted) !important;
+}
+.text-gray-200 {
+  color: #e0f5ff !important;
+}
+
+/* ======= Pills de ESTADO Activo / Inactivo ======= */
 .bg-green-900 {
   background-color: #0b5d3b !important;  /* verde macaw */
 }
@@ -68,28 +136,17 @@ nav {
   color: #ff9aa6 !important;
 }
 
-/* Encabezado de la tabla */
-thead.bg-gray-700 {
-  background: rgba(3, 32, 45, 0.95) !important;
-  border-bottom: 1px solid var(--color-border-soft);
-}
-
-/* Filas de la tabla */
-tbody tr {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-}
-tbody tr:hover {
-  background: rgba(4, 52, 71, 0.85) !important;
-}
-
-/* Título grande arriba (“Gestión de Empleados”) */
+/* ======= Título grande (“Gestión de Empleados”) ======= */
 h2 {
   letter-spacing: 0.04em;
 }
 
-/* Botón + Agregar Empleado un poco más “premium” */
-button.bg-primary,
-button.bg-secondary {
-  box-shadow: 0 10px 25px rgba(0, 150, 214, 0.35);
-  border-radius: 999px;
+/* ======= Ajuste general de tarjetas / paneles ======= */
+tbody tr {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+/* Un poquito más de “rounded” a las tarjetas superiores si usan rounded-xl */
+.rounded-xl {
+  border-radius: 18px !important;
 }
