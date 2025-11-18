@@ -369,17 +369,27 @@ const App: React.FC = () => {
 
   return (
     <div className="flex flex-col md:flex-row h-screen font-sans">
-      <nav className="w-full md:w-24 bg-neutral p-2 flex md:flex-col justify-around md:justify-start md:space-y-4 shadow-lg z-10">
-        <div className="flex flex-col items-center mb-6 hidden md:flex">
-          <BriefcaseIcon />
-          <h1 className="text-sm font-bold mt-1 text-center">Nómina 360</h1>
-        </div>
-        <NavItem view="employees" label="Empleados" icon={<UserGroupIcon />} />
-        <NavItem view="payroll" label="Nómina" icon={<DocumentTextIcon />} />
-        <NavItem view="settlement" label="Liquidación" icon={<BriefcaseIcon />} />
-        <NavItem view="history" label="Historial" icon={<ArchiveIcon />} />
-        <NavItem view="parameters" label="Parámetros" icon={<CogIcon />} />
-      </nav>
+<nav className="w-full md:w-24 bg-neutral p-2 flex md:flex-col justify-around md:justify-start md:space-y-4 shadow-lg z-10">
+  {/* Logo Macaw en el sidebar */}
+  <div className="flex flex-col items-center mb-6 hidden md:flex">
+    <img
+      src={macawLogo}
+      alt="Macaw Hotel"
+      className="w-14 h-14 rounded-full shadow-lg border-2 border-cyan-300 object-cover"
+    />
+    <h1 className="text-xs font-bold mt-2 text-center tracking-wide">
+      Nómina 360
+    </h1>
+  </div>
+
+  {/* el resto de tus NavItem */}
+  <NavItem view="employees" label="Empleados" icon={<UserGroupIcon />} />
+  <NavItem view="payroll" label="Nómina" icon={<DocumentTextIcon />} />
+  <NavItem view="settlement" label="Liquidación" icon={<BriefcaseIcon />} />
+  <NavItem view="history" label="Historial" icon={<ArchiveIcon />} />
+  <NavItem view="parameters" label="Parámetros" icon={<CogIcon />} />
+</nav>
+
 
       <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto bg-base-100">
         <div className="flex justify-between items-center mb-6">
