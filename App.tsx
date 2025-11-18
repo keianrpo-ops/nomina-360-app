@@ -22,6 +22,12 @@ import {
   SHEET_SETTLEMENTS,
 } from './services/services/googleSheetsService';
 
+// 🔹 Helper: NO guardar la foto en localStorage (solo en Sheets)
+const stripFoto = (emp: Employee): Employee => ({
+  ...emp,
+  Foto: '',
+});
+
 // Icons for navigation
 const UserGroupIcon = () => (
   <svg
@@ -156,12 +162,16 @@ const App: React.FC = () => {
     }
   };
 
-  // ✅ Guardar empleado
+  // ✅ Guardar empleado (foto SOLO en Sheets, NO en localStorage)
   const addEmployee = (employee: Omit<Employee, 'ID'>) => {
     const newEmployee: Employee = { ...employee, ID: Date.now() };
 
-    setEmployees([...employees, newEmployee]);
+    // limpiamos cualquier foto que ya esté en localStorage
+    const sanitizedExisting = employees.map(stripFoto);
+    const newList = [...sanitizedExisting, stripFoto(newEmployee)];
+    setEmployees(newList);
 
+    // enviamos la foto completa a Google Sheets
     addToSheet(SHEET_EMPLOYEES, {
       id: newEmployee.ID,
       cedula: newEmployee.Cedula,
@@ -186,9 +196,12 @@ const App: React.FC = () => {
   };
 
   const updateEmployee = (updatedEmployee: Employee) => {
-    setEmployees(
-      employees.map((e) => (e.ID === updatedEmployee.ID ? updatedEmployee : e)),
+    // también limpiamos fotos cuando actualizamos
+    const sanitizedExisting = employees.map(stripFoto);
+    const newList = sanitizedExisting.map((e) =>
+      e.ID === updatedEmployee.ID ? stripFoto(updatedEmployee) : e,
     );
+    setEmployees(newList);
   };
 
   // ✅ Guardar nómina
