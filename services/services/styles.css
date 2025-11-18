@@ -1,95 +1,106 @@
-/* ===== PALETA MACAW HOTEL ===== */
+/* ============== PALETA MACAW HOTEL (CLARA) ============== */
 :root {
-  --color-bg-main: #051821;       /* fondo general profundo */
-  --color-bg-card: #0c2733;       /* paneles / tarjetas */
-  --color-accent: #0096D6;        /* azul del logo */
-  --color-accent-soft: #35B3E9;   /* azul claro para hover */
-  --color-accent-yellow: #FFC933; /* amarillo pico */
-  --color-text-main: #F9FDFF;
-  --color-text-muted: #A8C4D4;
-  --color-border-soft: rgba(255, 255, 255, 0.08);
+  --macaw-blue: #02A9E7;
+  --macaw-blue-soft: #7ad7ff;
+  --macaw-bg: #EAF8FF;
+  --macaw-row: #ffffff;
+  --macaw-row-alt: #f6fbff;
+  --macaw-sidebar: #02A9E7;
+  --macaw-sidebar-dark: #0084b5;
+  --macaw-text-main: #094063;
+  --macaw-text-muted: #5f7d96;
+  --macaw-accent-yellow: #FFC933;
 }
 
-/* Fondo general de la app */
+/* Fondo global */
 body {
   margin: 0;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background: radial-gradient(circle at top left, #164055, #051821 55%);
-  color: var(--color-text-main);
+  background: var(--macaw-bg);
+  color: var(--macaw-text-main);
 }
 
-/* Panel central (donde está la tabla) */
+/* Panel principal (tarjeta grande donde está la tabla) */
 .bg-base-100 {
-  background-color: var(--color-bg-main) !important;
-}
-
-/* Tarjeta grande gris oscura */
-.bg-neutral {
-  background: linear-gradient(145deg, #061f2b, #0d313f) !important;
+  background-color: #ffffff !important;
+  box-shadow: 0 18px 35px rgba(0, 0, 0, 0.05);
   border-radius: 18px;
-  border: 1px solid var(--color-border-soft);
 }
 
-/* Sidebar */
-nav {
-  background: #021219 !important;
+/* ================= SIDEBAR ================= */
+nav,
+.drawer-side,
+.drawer-side .menu {
+  background: var(--macaw-sidebar) !important;
+  color: #ffffff !important;
 }
 
-/* Botones principales (verde/azul actuales) */
+/* Items del menú lateral (Empleados, Nómina, etc.) */
+.drawer-side .menu li > * {
+  color: #ffffff !important;
+  border-radius: 999px;
+}
+
+.drawer-side .menu li > *:hover {
+  background: var(--macaw-sidebar-dark) !important;
+}
+
+/* Botones redondos del lateral */
+.btn-ghost,
+.btn-circle {
+  background: rgba(255,255,255,0.18) !important;
+  color: #ffffff !important;
+}
+.btn-ghost:hover,
+.btn-circle:hover {
+  background: rgba(255,255,255,0.28) !important;
+}
+
+/* ================= BOTONES SUPERIORES ================= */
 .bg-primary {
-  background: var(--color-accent) !important;
+  background: var(--macaw-blue) !important;
+  color: #ffffff !important;
+  border-radius: 999px;
 }
-
 .bg-primary:hover {
-  background: var(--color-accent-soft) !important;
+  background: #0194cf !important;
 }
 
-/* Botones secundarios (por ej. “Generar nómina demo”) */
 .bg-secondary {
-  background: var(--color-accent-yellow) !important;
-  color: #08202b !important;
-}
-.bg-secondary:hover {
-  filter: brightness(1.05);
+  background: var(--macaw-accent-yellow) !important;
+  color: #1b2940 !important;
 }
 
-/* Pills de ESTADO Activo / Inactivo */
-.bg-green-900 {
-  background-color: #0b5d3b !important;  /* verde macaw */
-}
-.text-green-300 {
-  color: #73f0b2 !important;
-}
+/* ================= TABLA ================= */
 
-.bg-red-900 {
-  background-color: #5d1020 !important;
-}
-.text-red-300 {
-  color: #ff9aa6 !important;
-}
-
-/* Encabezado de la tabla */
+/* Encabezado */
+thead,
 thead.bg-gray-700 {
-  background: rgba(3, 32, 45, 0.95) !important;
-  border-bottom: 1px solid var(--color-border-soft);
+  background: #E1F6FF !important;
+  color: var(--macaw-text-main) !important;
 }
 
-/* Filas de la tabla */
+/* Filas: adiós barras negras */
 tbody tr {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  background-color: var(--macaw-row);
+}
+tbody tr:nth-child(even) {
+  background-color: var(--macaw-row-alt);
 }
 tbody tr:hover {
-  background: rgba(4, 52, 71, 0.85) !important;
+  background-color: #dff3ff !important;
 }
 
-/* Título grande arriba (“Gestión de Empleados”) */
-h2 {
-  letter-spacing: 0.04em;
+/* Pills de estado */
+.bg-green-900 {
+  background-color: #4bbf73 !important;
 }
-
-/* Botón + Agregar Empleado un poco más “premium” */
-button.bg-primary,
-button.bg-secondary {
-  box-shadow: 0 10px 25px rgba(0, 150, 214, 0.35);
-  border-radius: 999px;
+.text-green-300 {
+  color: #e9fff3 !important;
+}
+.bg-red-900 {
+  background-color: #ff5c75 !important;
+}
+.text-red-300 {
+  color: #ffe9ed !important;
 }
