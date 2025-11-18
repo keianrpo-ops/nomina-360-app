@@ -18,6 +18,7 @@ export const DEFAULT_PARAMETERS: Parameter[] = [
   { Clave: 'Tope_Aux_Transporte_SMMLV', Valor: 2, Descripcion: 'Salario máximo (en SMMLV) para recibir Aux. Transporte' },
 ];
 
+
 export const DEMO_EMPLOYEE: Employee = {
     ID: 1001,
     Cedula: '123456789',
