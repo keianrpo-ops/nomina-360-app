@@ -1,0 +1,95 @@
+/* ===== PALETA MACAW HOTEL ===== */
+:root {
+  --color-bg-main: #051821;       /* fondo general profundo */
+  --color-bg-card: #0c2733;       /* paneles / tarjetas */
+  --color-accent: #0096D6;        /* azul del logo */
+  --color-accent-soft: #35B3E9;   /* azul claro para hover */
+  --color-accent-yellow: #FFC933; /* amarillo pico */
+  --color-text-main: #F9FDFF;
+  --color-text-muted: #A8C4D4;
+  --color-border-soft: rgba(255, 255, 255, 0.08);
+}
+
+/* Fondo general de la app */
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: radial-gradient(circle at top left, #164055, #051821 55%);
+  color: var(--color-text-main);
+}
+
+/* Panel central (donde está la tabla) */
+.bg-base-100 {
+  background-color: var(--color-bg-main) !important;
+}
+
+/* Tarjeta grande gris oscura */
+.bg-neutral {
+  background: linear-gradient(145deg, #061f2b, #0d313f) !important;
+  border-radius: 18px;
+  border: 1px solid var(--color-border-soft);
+}
+
+/* Sidebar */
+nav {
+  background: #021219 !important;
+}
+
+/* Botones principales (verde/azul actuales) */
+.bg-primary {
+  background: var(--color-accent) !important;
+}
+
+.bg-primary:hover {
+  background: var(--color-accent-soft) !important;
+}
+
+/* Botones secundarios (por ej. “Generar nómina demo”) */
+.bg-secondary {
+  background: var(--color-accent-yellow) !important;
+  color: #08202b !important;
+}
+.bg-secondary:hover {
+  filter: brightness(1.05);
+}
+
+/* Pills de ESTADO Activo / Inactivo */
+.bg-green-900 {
+  background-color: #0b5d3b !important;  /* verde macaw */
+}
+.text-green-300 {
+  color: #73f0b2 !important;
+}
+
+.bg-red-900 {
+  background-color: #5d1020 !important;
+}
+.text-red-300 {
+  color: #ff9aa6 !important;
+}
+
+/* Encabezado de la tabla */
+thead.bg-gray-700 {
+  background: rgba(3, 32, 45, 0.95) !important;
+  border-bottom: 1px solid var(--color-border-soft);
+}
+
+/* Filas de la tabla */
+tbody tr {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+tbody tr:hover {
+  background: rgba(4, 52, 71, 0.85) !important;
+}
+
+/* Título grande arriba (“Gestión de Empleados”) */
+h2 {
+  letter-spacing: 0.04em;
+}
+
+/* Botón + Agregar Empleado un poco más “premium” */
+button.bg-primary,
+button.bg-secondary {
+  box-shadow: 0 10px 25px rgba(0, 150, 214, 0.35);
+  border-radius: 999px;
+}
