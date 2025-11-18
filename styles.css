@@ -1,152 +1,154 @@
-/* =========================================
-   PALETA MACAW HOTEL
-   ========================================= */
+/* ===== PALETA MACAW HOTEL – TEMA CLARO ===== */
 :root {
-  --color-bg-main: #051821;       /* fondo general profundo */
-  --color-bg-card: #0c2733;       /* paneles / tarjetas */
-  --color-accent: #0096D6;        /* azul del logo */
-  --color-accent-soft: #35B3E9;   /* azul claro para hover */
-  --color-accent-yellow: #FFC933; /* amarillo pico */
-  --color-text-main: #F9FDFF;
-  --color-text-muted: #A8C4D4;
-  --color-border-soft: rgba(255, 255, 255, 0.08);
+  --macaw-teal: #00a4e4;
+  --macaw-teal-dark: #0080b5;
+  --macaw-yellow: #ffc933;
+  --macaw-bg: #f4fcff;
+  --macaw-card: #ffffff;
+  --macaw-text-main: #074455;
+  --macaw-text-soft: #4a7484;
+  --macaw-border-soft: rgba(6, 126, 161, 0.15);
 }
 
-/* ===== Fondo general de la app ===== */
+/* Fondo general */
 body {
   margin: 0;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background: radial-gradient(circle at top left, #164055, #051821 55%);
-  color: var(--color-text-main);
+  background: var(--macaw-bg);
+  color: var(--macaw-text-main);
 }
 
-/* Contenedor principal (bg-base-100 en tu código) */
+/* Panel central que envuelve todo (bg-base-100 en tu JSX) */
 .bg-base-100 {
-  background-color: var(--color-bg-main) !important;
+  background-color: var(--macaw-bg) !important;
 }
 
-/* Tarjeta grande gris oscura (donde está la tabla, sidebar header, etc.) */
+/* Tarjeta grande central (donde está la tabla, className="bg-neutral") */
 .bg-neutral {
-  background: linear-gradient(145deg, #061f2b, #0d313f) !important;
+  background: var(--macaw-card) !important;
   border-radius: 18px;
-  border: 1px solid var(--color-border-soft);
+  border: 1px solid var(--macaw-border-soft);
+  box-shadow: 0 14px 40px rgba(0, 120, 160, 0.12);
 }
 
-/* ======= Sidebar ======= */
+/* ===== SIDEBAR ===== */
 nav {
-  background: #021219 !important;
+  background: linear-gradient(180deg, var(--macaw-teal), var(--macaw-teal-dark)) !important;
+  color: #ffffff;
 }
 
-/* Icono activo del sidebar (círculo amarillo) ya viene del tema,
-   solo afinamos un poco el contraste si se usa bg-yellow-400 */
-.bg-yellow-400,
-.bg-yellow-500 {
-  background-color: var(--color-accent-yellow) !important;
-  color: #08202b !important;
+/* Encabezado del sidebar con logo */
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 24px;
 }
 
-/* ======= Botones principales de arriba =======
-   (Cargar Empleado Demo, Generar Nómina Demo, Probar conexión...) */
-
-/* Cualquier botón verde (bg-green-600 / hover:bg-green-700) */
-.bg-green-600,
-.hover\:bg-green-700:hover {
-  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-soft)) !important;
-  border-radius: 999px !important;
-  border: none !important;
+.sidebar-logo-wrapper {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
 }
 
-/* Botones azules y morados (bg-blue-600, bg-purple-600, etc.) */
-.bg-blue-600,
-.bg-purple-600,
-.hover\:bg-blue-700:hover,
-.hover\:bg-purple-700:hover {
-  background: linear-gradient(135deg, var(--color-accent-soft), var(--color-accent)) !important;
-  border-radius: 999px !important;
-  border: none !important;
+.sidebar-logo {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
 }
 
-/* Unificamos estilo del botón “+ Agregar Empleado” (bg-primary / bg-secondary si se usan) */
+.sidebar-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+/* Botón del menú activo (el círculo amarillo de Empleados que ya ves) */
+button, a {
+  font-family: inherit;
+}
+
+/* ===== BOTONES SUPERIORES ===== */
 .bg-primary {
-  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-soft)) !important;
+  background: var(--macaw-teal) !important;
+  color: #ffffff !important;
+  border-radius: 999px !important;
+  box-shadow: 0 10px 25px rgba(0, 164, 228, 0.35);
+  border: none;
 }
 .bg-primary:hover {
-  background: var(--color-accent-soft) !important;
+  background: #19b5f3 !important;
 }
 
 .bg-secondary {
-  background: var(--color-accent-yellow) !important;
-  color: #08202b !important;
+  background: var(--macaw-yellow) !important;
+  color: #084457 !important;
+  border-radius: 999px !important;
+  border: none;
 }
 .bg-secondary:hover {
   filter: brightness(1.05);
 }
 
-/* Sombra suave para todos los botones “importantes” */
-button.bg-green-600,
-button.bg-blue-600,
-button.bg-purple-600,
-button.bg-primary,
-button.bg-secondary {
-  box-shadow: 0 10px 25px rgba(0, 150, 214, 0.35);
+/* Título grande “Gestión De Empleados” */
+h2 {
+  letter-spacing: 0.03em;
+  color: var(--macaw-text-main);
 }
 
-/* ======= Tabla de empleados ======= */
+/* ===== TABLA ===== */
 
-/* Encabezado de la tabla */
-thead.bg-gray-700,
-.bg-gray-700 {
-  background: rgba(3, 32, 45, 0.95) !important;
-  border-bottom: 1px solid var(--color-border-soft);
-}
-
-/* Filas de la tabla */
-.bg-gray-800 {
-  background-color: var(--color-bg-card) !important;
-}
-.border-gray-700 {
-  border-color: rgba(255, 255, 255, 0.06) !important;
+/* Encabezado */
+thead.bg-gray-700 {
+  background: #e3f6ff !important;
+  color: var(--macaw-text-main) !important;
+  border-bottom: 1px solid var(--macaw-border-soft);
 }
 
-/* Hover de las filas (hover:bg-gray-600) */
-.hover\:bg-gray-600:hover {
-  background: rgba(4, 52, 71, 0.85) !important;
+/* Filas */
+tbody tr {
+  background: #ffffff;
+  border-bottom: 1px solid rgba(6, 126, 161, 0.08);
+}
+tbody tr:nth-child(even) {
+  background: #f8fcff;
+}
+tbody tr:hover {
+  background: #e8f7ff !important;
 }
 
-/* Texto gris de la tabla */
-.text-gray-400 {
-  color: var(--color-text-muted) !important;
-}
-.text-gray-200 {
-  color: #e0f5ff !important;
-}
-
-/* ======= Pills de ESTADO Activo / Inactivo ======= */
+/* Pills de estado */
 .bg-green-900 {
-  background-color: #0b5d3b !important;  /* verde macaw */
+  background-color: #00a060 !important;
 }
 .text-green-300 {
-  color: #73f0b2 !important;
+  color: #eafff4 !important;
 }
 
 .bg-red-900 {
-  background-color: #5d1020 !important;
+  background-color: #e44242 !important;
 }
 .text-red-300 {
-  color: #ff9aa6 !important;
+  color: #ffeaea !important;
 }
 
-/* ======= Título grande (“Gestión de Empleados”) ======= */
-h2 {
-  letter-spacing: 0.04em;
+/* Links Editar / Eliminar */
+.text-accent {
+  color: var(--macaw-teal) !important;
+}
+.text-red-400 {
+  color: #ff4b4b !important;
 }
 
-/* ======= Ajuste general de tarjetas / paneles ======= */
-tbody tr {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+/* Ajustes pequeños para que todo se vea más liviano */
+table {
+  border-collapse: collapse;
 }
-
-/* Un poquito más de “rounded” a las tarjetas superiores si usan rounded-xl */
-.rounded-xl {
-  border-radius: 18px !important;
+th, td {
+  font-size: 0.9rem;
 }
