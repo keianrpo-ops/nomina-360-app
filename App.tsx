@@ -124,6 +124,17 @@ const BriefcaseIcon = () => (
 );
 
 // ========= COMPONENTE PRINCIPAL =========
+
+  const deletePayrolls = (ids: number[]) => {
+    if (ids.length === 0) return;
+    setPayrolls(prev => prev.filter(p => !ids.includes(p.ID_Mov)));
+  };
+
+  const deleteSettlements = (ids: number[]) => {
+    if (ids.length === 0) return;
+    setSettlements(prev => prev.filter(s => !ids.includes(s.ID_Liq)));
+  };
+
 const App: React.FC = () => {
   const [employees, setEmployees] = useLocalStorage<Employee[]>('employees', [
     DEMO_EMPLOYEE,
