@@ -22,18 +22,13 @@ import {
   SHEET_SETTLEMENTS,
 } from './services/services/googleSheetsService';
 
-
-
-
-
-
 // 🔹 Helper: NO guardar la foto en localStorage (solo en Sheets)
 const stripFoto = (emp: Employee): Employee => ({
   ...emp,
   Foto: '',
 });
 
-// Icons for navigation
+// ========= ICONOS DEL SIDEBAR =========
 const UserGroupIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -125,6 +120,7 @@ const BriefcaseIcon = () => (
   </svg>
 );
 
+// ========= COMPONENTE PRINCIPAL =========
 const App: React.FC = () => {
   const [employees, setEmployees] = useLocalStorage<Employee[]>('employees', [
     DEMO_EMPLOYEE,
@@ -140,7 +136,7 @@ const App: React.FC = () => {
   );
   const [activeView, setActiveView] = useState<AppView>('employees');
 
-  // 🔹 Botón de prueba
+  // 🔹 Botón de prueba Google Sheets
   const probarConexion = async () => {
     try {
       await addToSheet(SHEET_EMPLOYEES, {
@@ -171,12 +167,10 @@ const App: React.FC = () => {
   const addEmployee = (employee: Omit<Employee, 'ID'>) => {
     const newEmployee: Employee = { ...employee, ID: Date.now() };
 
-    // limpiamos cualquier foto que ya esté en localStorage
     const sanitizedExisting = employees.map(stripFoto);
     const newList = [...sanitizedExisting, stripFoto(newEmployee)];
     setEmployees(newList);
 
-    // enviamos la foto completa a Google Sheets
     addToSheet(SHEET_EMPLOYEES, {
       id: newEmployee.ID,
       cedula: newEmployee.Cedula,
@@ -201,7 +195,6 @@ const App: React.FC = () => {
   };
 
   const updateEmployee = (updatedEmployee: Employee) => {
-    // también limpiamos fotos cuando actualizamos
     const sanitizedExisting = employees.map(stripFoto);
     const newList = sanitizedExisting.map((e) =>
       e.ID === updatedEmployee.ID ? stripFoto(updatedEmployee) : e,
@@ -354,8 +347,9 @@ const App: React.FC = () => {
     } else {
       alert('No se pudo calcular la nómina demo.');
     }
-  }, [employees, parameters, addPayroll, setActiveView]);
+  }, [employees, parameters]);
 
+  // ========= NAV ITEM =========
   const NavItem: React.FC<{
     view: AppView;
     label: string;
@@ -363,9 +357,12 @@ const App: React.FC = () => {
   }> = ({ view, label, icon }) => (
     <button
       onClick={() => setActiveView(view)}
-      className={`flex flex-col items-center justify-center p-2 rounded-lg transition-colors duration-200 ${
-        activeView === view ? 'bg-secondary text-white' : 'hover:bg-neutral'
-      }`}
+      className={`flex flex-col items-center justify-center p-2 rounded-lg transition-all duration-200
+        ${
+          activeView === view
+            ? 'bg-white text-sky-700 shadow-md'
+            : 'text-white opacity-70 hover:bg-sky-600 hover:opacity-100'
+        }`}
     >
       {icon}
       <span className="text-xs mt-1">{label}</span>
@@ -374,33 +371,31 @@ const App: React.FC = () => {
 
   return (
     <div className="flex flex-col md:flex-row h-screen font-sans">
-<nav className="w-full md:w-24 bg-neutral p-2 flex md:flex-col justify-around md:justify-start md:space-y-4 shadow-lg z-10">
-  {/* Logo Macaw en el sidebar */}
-  <div className="flex flex-col items-center mb-6 hidden md:flex">
-  <img
-  src="/macaw-logo-3d.png"
-  alt="Macaw Logo"
-  className="h-10 w-10"
-/>
+      {/* SIDEBAR */}
+      <nav className="w-full md:w-24 bg-sky-500 text-white p-2 flex md:flex-col justify-around md:justify-start md:space-y-4 shadow-lg z-10">
+        {/* Logo Macaw */}
+        <div className="flex flex-col items-center mb-6 hidden md:flex">
+          <img
+            src="/macaw-logo-3d.png"
+            alt="Macaw Logo"
+            className="h-10 w-10 rounded-full bg-white object-cover shadow-md"
+          />
+          <h1 className="text-xs font-bold mt-2 text-center tracking-wide">
+            Nómina 360
+          </h1>
+        </div>
 
+        <NavItem view="employees" label="Empleados" icon={<UserGroupIcon />} />
+        <NavItem view="payroll" label="Nómina" icon={<DocumentTextIcon />} />
+        <NavItem view="settlement" label="Liquidación" icon={<BriefcaseIcon />} />
+        <NavItem view="history" label="Historial" icon={<ArchiveIcon />} />
+        <NavItem view="parameters" label="Parámetros" icon={<CogIcon />} />
+      </nav>
 
-    <h1 className="text-xs font-bold mt-2 text-center tracking-wide">
-      Nómina 360
-    </h1>
-  </div>
-
-  {/* el resto de tus NavItem */}
-  <NavItem view="employees" label="Empleados" icon={<UserGroupIcon />} />
-  <NavItem view="payroll" label="Nómina" icon={<DocumentTextIcon />} />
-  <NavItem view="settlement" label="Liquidación" icon={<BriefcaseIcon />} />
-  <NavItem view="history" label="Historial" icon={<ArchiveIcon />} />
-  <NavItem view="parameters" label="Parámetros" icon={<CogIcon />} />
-</nav>
-
-
+      {/* MAIN */}
       <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto bg-base-100">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl sm:text-3xl font-bold capitalize text-white">
+          <h2 className="text-2xl sm:text-3xl font-bold capitalize text-sky-800">
             {activeView === 'employees' && 'Gestión de Empleados'}
             {activeView === 'payroll' && 'Proceso de Nómina'}
             {activeView === 'settlement' && 'Liquidación de Contrato'}
@@ -429,7 +424,8 @@ const App: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-neutral p-4 sm:p-6 rounded-xl shadow-2xl">
+        {/* Tarjeta principal blanca */}
+        <div className="bg-white p-4 sm:p-6 rounded-xl shadow-2xl">
           {activeView === 'employees' && (
             <EmployeeView
               employees={employees}
