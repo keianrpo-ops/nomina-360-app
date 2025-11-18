@@ -10,6 +10,41 @@ interface EmployeeViewProps {
 }
 
 // -----------------------------
+// Estado inicial del formulario
+// -----------------------------
+type EmployeeFormState = {
+  Cedula: string;
+  Nombres: string;
+  Apellidos: string;
+  Cargo: string;
+  Fecha_Ingreso: string;
+  Tipo_Contrato: ContractType;
+  Tipo_Sueldo: SalaryType;
+  Salario_Base: string;
+  Aux_Transporte: string;
+  Correo: string;
+  Estado: EmployeeStatus;
+  Fecha_Retiro: string;
+  Foto: string;
+};
+
+const initialFormState: EmployeeFormState = {
+  Cedula: '',
+  Nombres: '',
+  Apellidos: '',
+  Cargo: '',
+  Fecha_Ingreso: '',
+  Tipo_Contrato: ContractType.Indefinido,
+  Tipo_Sueldo: SalaryType.Basico,
+  Salario_Base: '',
+  Aux_Transporte: '',
+  Correo: '',
+  Estado: EmployeeStatus.Activo,
+  Fecha_Retiro: '',
+  Foto: '',
+};
+
+// -----------------------------
 // FORMULARIO (crear / editar)
 // -----------------------------
 const EmployeeForm: React.FC<{
@@ -17,24 +52,10 @@ const EmployeeForm: React.FC<{
   onClose: () => void;
   employeeToEdit?: Employee | null;
 }> = ({ onSubmit, onClose, employeeToEdit }) => {
+  const [formData, setFormData] = useState<EmployeeFormState>(initialFormState);
+  const [preview, setPreview] = useState<string | null>(null);
 
-  const [formData, setFormData] = useState({
-    Cedula: '',
-    Nombres: '',
-    Apellidos: '',
-    Cargo: '',
-    Fecha_Ingreso: '',
-    Tipo_Contrato: ContractType.Indefinido,
-    Tipo_Sueldo: SalaryType.Basico,
-    Salario_Base: '',
-    Aux_Transporte: '',
-    Correo: '',
-    Estado: EmployeeStatus.Activo,
-    Fecha_Retiro: '',
-    Foto: '' as string,          // 👈 NUEVO CAMPO
-  });
-
-  // Cargar datos al editar
+  // Cargar datos cuando se edita
   useEffect(() => {
     if (employeeToEdit) {
       setFormData({
@@ -49,9 +70,13 @@ const EmployeeForm: React.FC<{
         Aux_Transporte: String(employeeToEdit.Aux_Transporte),
         Correo: employeeToEdit.Correo,
         Estado: employeeToEdit.Estado,
-        Fecha_Retiro: employeeToEdit.Fecha_Retiro || '',
-        Foto: employeeToEdit.Foto || '',
+        Fecha_Retiro: employeeToEdit.Fecha_Retiro ?? '',
+        Foto: employeeToEdit.Foto ?? '',
       });
+      setPreview(employeeToEdit.Foto ?? null);
+    } else {
+      setFormData(initialFormState);
+      setPreview(null);
     }
   }, [employeeToEdit]);
 
@@ -62,23 +87,27 @@ const EmployeeForm: React.FC<{
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  // 👇 NUEVO: manejar archivo de foto → base64
-  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     const reader = new FileReader();
     reader.onloadend = () => {
-      setFormData(prev => ({
-        ...prev,
-        Foto: reader.result as string, // data:image/png;base64,...
-      }));
+      const base64 = reader.result as string;
+      setFormData(prev => ({ ...prev, Foto: base64 }));
+      setPreview(base64);
     };
     reader.readAsDataURL(file);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    // ✅ Foto OBLIGATORIA (tanto crear como editar)
+    if (!formData.Foto || formData.Foto === '') {
+      alert('Por favor selecciona una foto para este empleado.');
+      return;
+    }
 
     const employeeData = {
       ...formData,
@@ -102,7 +131,6 @@ const EmployeeForm: React.FC<{
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-
       <div className={formGridClass}>
         <div>
           <label className={labelClass}>Cédula</label>
@@ -185,7 +213,9 @@ const EmployeeForm: React.FC<{
             className={inputClass}
           >
             {Object.values(ContractType).map(v => (
-              <option key={v} value={v}>{v}</option>
+              <option key={v} value={v}>
+                {v}
+              </option>
             ))}
           </select>
         </div>
@@ -199,7 +229,9 @@ const EmployeeForm: React.FC<{
             className={inputClass}
           >
             {Object.values(SalaryType).map(v => (
-              <option key={v} value={v}>{v}</option>
+              <option key={v} value={v}>
+                {v}
+              </option>
             ))}
           </select>
         </div>
@@ -237,7 +269,9 @@ const EmployeeForm: React.FC<{
             className={inputClass}
           >
             {Object.values(EmployeeStatus).map(v => (
-              <option key={v} value={v}>{v}</option>
+              <option key={v} value={v}>
+                {v}
+              </option>
             ))}
           </select>
         </div>
@@ -255,24 +289,30 @@ const EmployeeForm: React.FC<{
           </div>
         )}
 
-        {/* FOTO (ocupa el ancho completo en desktop) */}
-        <div className="md:col-span-2">
-          <label className={labelClass}>Foto (opcional)</label>
-          <div className="flex items-center space-x-4">
+        {/* FOTO - OBLIGATORIA */}
+        <div className="md:col-span-2 flex flex-col md:flex-row md:items-center gap-4 mt-2">
+          <div className="flex-1">
+            <label className={labelClass}>Foto * (obligatoria)</label>
             <input
               type="file"
               accept="image/*"
-              onChange={handlePhotoChange}
-              className="text-sm text-gray-300"
+              onChange={handleFileChange}
+              className={inputClass}
             />
-            {formData.Foto && (
-              <img
-                src={formData.Foto}
-                alt="Vista previa"
-                className="w-16 h-16 rounded-full object-cover border border-gray-600"
-              />
-            )}
+            <p className="text-xs text-gray-400 mt-1">
+              La imagen se guarda en la base de datos como Base64 y se envía a Google Sheets.
+            </p>
           </div>
+
+          {preview && (
+            <div className="flex items-center justify-center">
+              <img
+                src={preview}
+                alt="Preview empleado"
+                className="w-24 h-24 md:w-28 md:h-28 rounded-full object-cover border-2 border-accent shadow-lg"
+              />
+            </div>
+          )}
         </div>
       </div>
 
@@ -292,7 +332,6 @@ const EmployeeForm: React.FC<{
           {employeeToEdit ? 'Actualizar' : 'Crear'} Empleado
         </button>
       </div>
-
     </form>
   );
 };
@@ -347,7 +386,7 @@ const EmployeeView: React.FC<EmployeeViewProps> = ({
 
       <div className="overflow-x-auto">
         <table className="w-full text-sm text-left text-gray-400">
-          <thead className="text-xs text-gray-2 00 uppercase bg-gray-700">
+          <thead className="text-xs text-gray-200 uppercase bg-gray-700">
             <tr>
               <th className="px-6 py-3">Nombre</th>
               <th className="px-6 py-3">Cédula</th>
@@ -372,7 +411,7 @@ const EmployeeView: React.FC<EmployeeViewProps> = ({
                 <td className="px-6 py-4">
                   <span
                     className={`px-2 py-1 rounded-full text-xs ${
-                      employee.Estado === 'Activo'
+                      employee.Estado === EmployeeStatus.Activo
                         ? 'bg-green-900 text-green-300'
                         : 'bg-red-900 text-red-300'
                     }`}
