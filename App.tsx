@@ -378,11 +378,12 @@ const App: React.FC = () => {
 <nav className="w-full md:w-24 bg-neutral p-2 flex md:flex-col justify-around md:justify-start md:space-y-4 shadow-lg z-10">
   {/* Logo Macaw en el sidebar */}
   <div className="flex flex-col items-center mb-6 hidden md:flex">
-   <img
-  src="/macaw-logo.png"
-  alt="Macaw Hotel"
-  className="h-10 w-10 rounded-full shadow-lg"
+  <img
+  src="/macaw-logo-3d.png"
+  alt="Macaw Logo"
+  className="h-10 w-10"
 />
+
 
     <h1 className="text-xs font-bold mt-2 text-center tracking-wide">
       Nómina 360
