@@ -22,10 +22,10 @@ import {
   SHEET_SETTLEMENTS,
 } from './services/services/googleSheetsService';
 
-// 👇 RUTA CORRECTA (el archivo está en src/assets)
+// 👇 Ruta correcta del logo (archivo está en src/assets)
 import macawLogo from './assets/macaw-logo-3d.png';
 
-// 🔹 Helper: NO guardar la foto en localStorage (solo en Sheets)
+// Helper: NO guardar la foto en localStorage (solo en Sheets)
 const stripFoto = (emp: Employee): Employee => ({
   ...emp,
   Foto: '',
@@ -139,7 +139,7 @@ const App: React.FC = () => {
   );
   const [activeView, setActiveView] = useState<AppView>('employees');
 
-  // 🔹 Botón de prueba Google Sheets
+  // Botón de prueba Google Sheets
   const probarConexion = async () => {
     try {
       await addToSheet(SHEET_EMPLOYEES, {
@@ -166,7 +166,7 @@ const App: React.FC = () => {
     }
   };
 
-  // ✅ Guardar empleado (foto SOLO en Sheets, NO en localStorage)
+  // Guardar empleado (foto SOLO en Sheets, NO en localStorage)
   const addEmployee = (employee: Omit<Employee, 'ID'>) => {
     const newEmployee: Employee = { ...employee, ID: Date.now() };
 
@@ -205,14 +205,14 @@ const App: React.FC = () => {
     setEmployees(newList);
   };
 
-  // ✅ Eliminar empleado (sin confirm aquí; se hace en EmployeeView)
+  // Eliminar empleado (la confirmación se hace en EmployeeView)
   const deleteEmployee = (id: number) => {
     const sanitizedExisting = employees.map(stripFoto);
     const newList = sanitizedExisting.filter((e) => e.ID !== id);
     setEmployees(newList);
   };
 
-  // ✅ Guardar nómina
+  // Guardar nómina
   const addPayroll = (
     payroll: Omit<PayrollEntry, 'ID_Mov' | 'Fecha_Registro'>,
   ) => {
@@ -254,7 +254,7 @@ const App: React.FC = () => {
     });
   };
 
-  // ✅ Guardar liquidación
+  // Guardar liquidación
   const addSettlement = (
     settlement: Omit<SettlementEntry, 'ID_Liq' | 'Fecha_Registro'>,
   ) => {
@@ -357,8 +357,7 @@ const App: React.FC = () => {
     } else {
       alert('No se pudo calcular la nómina demo.');
     }
-  }, [employees, parameters, addPayroll, setActiveView as any]);
-  // el cast "as any" es solo para evitar warnings de dependencia, no afecta runtime
+  }, [employees, parameters]);
 
   // ========= NAV ITEM =========
   const NavItem: React.FC<{
@@ -443,9 +442,10 @@ const App: React.FC = () => {
               employees={employees}
               onAdd={addEmployee}
               onUpdate={updateEmployee}
-              onDelete={deleteEmployee}   {/* 👈 AQUÍ SE CONECTA ELIMINAR */}
+              onDelete={deleteEmployee}
             />
           )}
+
           {activeView === 'payroll' && (
             <PayrollView
               employees={employees}
@@ -453,6 +453,7 @@ const App: React.FC = () => {
               onRegister={addPayroll}
             />
           )}
+
           {activeView === 'settlement' && (
             <SettlementView
               employees={employees}
@@ -460,6 +461,7 @@ const App: React.FC = () => {
               onRegister={addSettlement}
             />
           )}
+
           {activeView === 'history' && (
             <HistoryView
               payrolls={payrolls}
@@ -467,6 +469,7 @@ const App: React.FC = () => {
               employees={employees}
             />
           )}
+
           {activeView === 'parameters' && (
             <ParametersView
               parameters={parameters}
