@@ -337,7 +337,7 @@ const EmployeeForm: React.FC<{
 };
 
 // -----------------------------
-// LISTA DE EMPLEADOS
+// LISTA DE EMPLEADOS + SELECCIÓN MASIVA
 // -----------------------------
 const EmployeeView: React.FC<EmployeeViewProps> = ({
   employees,
@@ -347,6 +347,16 @@ const EmployeeView: React.FC<EmployeeViewProps> = ({
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [employeeToEdit, setEmployeeToEdit] = useState<Employee | null>(null);
+
+  // IDs seleccionados para eliminación masiva
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+
+  // Limpiar IDs que ya no existan cuando cambia la lista de empleados
+  useEffect(() => {
+    setSelectedIds(prev =>
+      prev.filter(id => employees.some(e => e.ID === id)),
+    );
+  }, [employees]);
 
   const handleAddClick = () => {
     setEmployeeToEdit(null);
@@ -373,21 +383,72 @@ const EmployeeView: React.FC<EmployeeViewProps> = ({
     }
   };
 
+  // ---- Selección individual ----
+  const toggleSelectOne = (id: number) => {
+    setSelectedIds(prev =>
+      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id],
+    );
+  };
+
+  // ---- Seleccionar / deseleccionar todos ----
+  const toggleSelectAll = () => {
+    if (selectedIds.length === employees.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(employees.map(e => e.ID));
+    }
+  };
+
+  // ---- Eliminación masiva ----
+  const handleBulkDelete = () => {
+    if (selectedIds.length === 0) return;
+
+    const ok = window.confirm(
+      `¿Seguro que deseas eliminar ${selectedIds.length} empleado(s)?`,
+    );
+    if (!ok) return;
+
+    selectedIds.forEach(id => onDelete(id));
+    setSelectedIds([]);
+  };
+
+  const allSelected =
+    employees.length > 0 && selectedIds.length === employees.length;
+
   return (
     <div>
-      <div className="flex justify-end mb-4">
+      <div className="flex justify-between mb-4 gap-2 flex-wrap">
         <button
           onClick={handleAddClick}
           className="bg-primary hover:bg-secondary text-white font-bold py-2 px-4 rounded-lg"
         >
           + Agregar Empleado
         </button>
+
+        <button
+          onClick={handleBulkDelete}
+          disabled={selectedIds.length === 0}
+          className={`font-bold py-2 px-4 rounded-lg border ${
+            selectedIds.length === 0
+              ? 'bg-gray-300 text-gray-500 cursor-not-allowed border-gray-300'
+              : 'bg-red-600 hover:bg-red-700 text-white border-red-700'
+          }`}
+        >
+          Eliminar seleccionados ({selectedIds.length})
+        </button>
       </div>
 
       <div className="overflow-x-auto">
-        <table className="w-full text-sm text-left text-gray-400">
-          <thead className="text-xs text-gray-200 uppercase bg-gray-700">
+        <table className="w-full text-sm text-left text-gray-600">
+          <thead className="text-xs text-gray-700 uppercase bg-gray-100">
             <tr>
+              <th className="px-4 py-3 text-center">
+                <input
+                  type="checkbox"
+                  checked={allSelected}
+                  onChange={toggleSelectAll}
+                />
+              </th>
               <th className="px-6 py-3">Nombre</th>
               <th className="px-6 py-3">Cédula</th>
               <th className="px-6 py-3">Cargo</th>
@@ -397,49 +458,74 @@ const EmployeeView: React.FC<EmployeeViewProps> = ({
           </thead>
 
           <tbody>
-            {employees.map(employee => (
-              <tr
-                key={employee.ID}
-                className="bg-gray-800 border-b border-gray-700 hover:bg-gray-600"
-              >
-                <td className="px-6 py-4">
-                  {employee.Nombres} {employee.Apellidos}
-                </td>
-                <td className="px-6 py-4">{employee.Cedula}</td>
-                <td className="px-6 py-4">{employee.Cargo}</td>
+            {employees.map(employee => {
+              const isSelected = selectedIds.includes(employee.ID);
+              return (
+                <tr
+                  key={employee.ID}
+                  className={`border-b border-gray-200 ${
+                    isSelected ? 'bg-blue-50' : 'bg-white'
+                  } hover:bg-blue-100`}
+                >
+                  <td className="px-4 py-4 text-center">
+                    <input
+                      type="checkbox"
+                      checked={isSelected}
+                      onChange={() => toggleSelectOne(employee.ID)}
+                    />
+                  </td>
 
-                <td className="px-6 py-4">
-                  <span
-                    className={`px-2 py-1 rounded-full text-xs ${
-                      employee.Estado === EmployeeStatus.Activo
-                        ? 'bg-green-900 text-green-300'
-                        : 'bg-red-900 text-red-300'
-                    }`}
-                  >
-                    {employee.Estado}
-                  </span>
-                </td>
+                  <td className="px-6 py-4">
+                    {employee.Nombres} {employee.Apellidos}
+                  </td>
+                  <td className="px-6 py-4">{employee.Cedula}</td>
+                  <td className="px-6 py-4">{employee.Cargo}</td>
 
-                <td className="px-6 py-4 space-x-3">
-                  <button
-                    onClick={() => handleEditClick(employee)}
-                    className="font-medium text-accent hover:underline"
-                  >
-                    Editar
-                  </button>
+                  <td className="px-6 py-4">
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs ${
+                        employee.Estado === EmployeeStatus.Activo
+                          ? 'bg-green-100 text-green-700'
+                          : 'bg-red-100 text-red-700'
+                      }`}
+                    >
+                      {employee.Estado}
+                    </span>
+                  </td>
 
-                  <button
-                    onClick={() => handleDeleteClick(employee.ID)}
-                    className="font-medium text-red-400 hover:underline"
-                  >
-                    Eliminar
-                  </button>
+                  <td className="px-6 py-4 space-x-3">
+                    <button
+                      onClick={() => handleEditClick(employee)}
+                      className="font-medium text-blue-600 hover:underline"
+                    >
+                      Editar
+                    </button>
+
+                    <button
+                      onClick={() => handleDeleteClick(employee.ID)}
+                      className="font-medium text-red-600 hover:underline"
+                    >
+                      Eliminar
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
+
+            {employees.length === 0 && (
+              <tr>
+                <td
+                  colSpan={6}
+                  className="px-6 py-4 text-center text-gray-400"
+                >
+                  No hay empleados registrados.
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>
+
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
