@@ -6,7 +6,7 @@ interface EmployeeViewProps {
   employees: Employee[];
   onAdd: (employee: Omit<Employee, 'ID'>) => void;
   onUpdate: (employee: Employee) => void;
-  onDelete: (id: number) => void; // 👈 AGREGADO
+  onDelete: (id: number) => void;
 }
 
 // -----------------------------
@@ -17,7 +17,7 @@ const EmployeeForm: React.FC<{
   onClose: () => void;
   employeeToEdit?: Employee | null;
 }> = ({ onSubmit, onClose, employeeToEdit }) => {
-  
+
   const [formData, setFormData] = useState({
     Cedula: '',
     Nombres: '',
@@ -30,17 +30,28 @@ const EmployeeForm: React.FC<{
     Aux_Transporte: '',
     Correo: '',
     Estado: EmployeeStatus.Activo,
-    Fecha_Retiro: ''
+    Fecha_Retiro: '',
+    Foto: '' as string,          // 👈 NUEVO CAMPO
   });
 
+  // Cargar datos al editar
   useEffect(() => {
     if (employeeToEdit) {
       setFormData({
-        ...employeeToEdit,
+        Cedula: employeeToEdit.Cedula,
+        Nombres: employeeToEdit.Nombres,
+        Apellidos: employeeToEdit.Apellidos,
+        Cargo: employeeToEdit.Cargo,
+        Fecha_Ingreso: employeeToEdit.Fecha_Ingreso,
+        Tipo_Contrato: employeeToEdit.Tipo_Contrato,
+        Tipo_Sueldo: employeeToEdit.Tipo_Sueldo,
         Salario_Base: String(employeeToEdit.Salario_Base),
         Aux_Transporte: String(employeeToEdit.Aux_Transporte),
-        Fecha_Retiro: employeeToEdit.Fecha_Retiro || ''
-      } as any);
+        Correo: employeeToEdit.Correo,
+        Estado: employeeToEdit.Estado,
+        Fecha_Retiro: employeeToEdit.Fecha_Retiro || '',
+        Foto: employeeToEdit.Foto || '',
+      });
     }
   }, [employeeToEdit]);
 
@@ -51,13 +62,28 @@ const EmployeeForm: React.FC<{
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  // 👇 NUEVO: manejar archivo de foto → base64
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setFormData(prev => ({
+        ...prev,
+        Foto: reader.result as string, // data:image/png;base64,...
+      }));
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     const employeeData = {
       ...formData,
       Salario_Base: parseFloat(formData.Salario_Base),
-      Aux_Transporte: parseFloat(formData.Aux_Transporte) || 0
+      Aux_Transporte: parseFloat(formData.Aux_Transporte) || 0,
     };
 
     if (employeeToEdit) {
@@ -80,79 +106,189 @@ const EmployeeForm: React.FC<{
       <div className={formGridClass}>
         <div>
           <label className={labelClass}>Cédula</label>
-          <input type="text" name="Cedula" value={formData.Cedula} onChange={handleChange} className={inputClass} required />
+          <input
+            type="text"
+            name="Cedula"
+            value={formData.Cedula}
+            onChange={handleChange}
+            className={inputClass}
+            required
+          />
         </div>
 
         <div>
           <label className={labelClass}>Nombres</label>
-          <input type="text" name="Nombres" value={formData.Nombres} onChange={handleChange} className={inputClass} required />
+          <input
+            type="text"
+            name="Nombres"
+            value={formData.Nombres}
+            onChange={handleChange}
+            className={inputClass}
+            required
+          />
         </div>
 
         <div>
           <label className={labelClass}>Apellidos</label>
-          <input type="text" name="Apellidos" value={formData.Apellidos} onChange={handleChange} className={inputClass} required />
+          <input
+            type="text"
+            name="Apellidos"
+            value={formData.Apellidos}
+            onChange={handleChange}
+            className={inputClass}
+            required
+          />
         </div>
 
         <div>
           <label className={labelClass}>Cargo</label>
-          <input type="text" name="Cargo" value={formData.Cargo} onChange={handleChange} className={inputClass} required />
+          <input
+            type="text"
+            name="Cargo"
+            value={formData.Cargo}
+            onChange={handleChange}
+            className={inputClass}
+            required
+          />
         </div>
 
         <div>
           <label className={labelClass}>Correo Electrónico</label>
-          <input type="email" name="Correo" value={formData.Correo} onChange={handleChange} className={inputClass} required />
+          <input
+            type="email"
+            name="Correo"
+            value={formData.Correo}
+            onChange={handleChange}
+            className={inputClass}
+            required
+          />
         </div>
 
         <div>
           <label className={labelClass}>Fecha de Ingreso</label>
-          <input type="date" name="Fecha_Ingreso" value={formData.Fecha_Ingreso} onChange={handleChange} className={inputClass} required />
+          <input
+            type="date"
+            name="Fecha_Ingreso"
+            value={formData.Fecha_Ingreso}
+            onChange={handleChange}
+            className={inputClass}
+            required
+          />
         </div>
 
         <div>
           <label className={labelClass}>Tipo de Contrato</label>
-          <select name="Tipo_Contrato" value={formData.Tipo_Contrato} onChange={handleChange} className={inputClass}>
-            {Object.values(ContractType).map(v => (<option key={v} value={v}>{v}</option>))}
+          <select
+            name="Tipo_Contrato"
+            value={formData.Tipo_Contrato}
+            onChange={handleChange}
+            className={inputClass}
+          >
+            {Object.values(ContractType).map(v => (
+              <option key={v} value={v}>{v}</option>
+            ))}
           </select>
         </div>
 
         <div>
           <label className={labelClass}>Tipo de Sueldo</label>
-          <select name="Tipo_Sueldo" value={formData.Tipo_Sueldo} onChange={handleChange} className={inputClass}>
-            {Object.values(SalaryType).map(v => (<option key={v} value={v}>{v}</option>))}
+          <select
+            name="Tipo_Sueldo"
+            value={formData.Tipo_Sueldo}
+            onChange={handleChange}
+            className={inputClass}
+          >
+            {Object.values(SalaryType).map(v => (
+              <option key={v} value={v}>{v}</option>
+            ))}
           </select>
         </div>
 
         <div>
           <label className={labelClass}>Salario Base</label>
-          <input type="number" name="Salario_Base" value={formData.Salario_Base} onChange={handleChange} className={inputClass} required />
+          <input
+            type="number"
+            name="Salario_Base"
+            value={formData.Salario_Base}
+            onChange={handleChange}
+            className={inputClass}
+            required
+          />
         </div>
 
         <div>
           <label className={labelClass}>Auxilio de Transporte</label>
-          <input type="number" name="Aux_Transporte" value={formData.Aux_Transporte} onChange={handleChange} className={inputClass} placeholder="0 si no aplica" />
+          <input
+            type="number"
+            name="Aux_Transporte"
+            value={formData.Aux_Transporte}
+            onChange={handleChange}
+            className={inputClass}
+            placeholder="0 si no aplica"
+          />
         </div>
 
         <div>
           <label className={labelClass}>Estado</label>
-          <select name="Estado" value={formData.Estado} onChange={handleChange} className={inputClass}>
-            {Object.values(EmployeeStatus).map(v => (<option key={v} value={v}>{v}</option>))}
+          <select
+            name="Estado"
+            value={formData.Estado}
+            onChange={handleChange}
+            className={inputClass}
+          >
+            {Object.values(EmployeeStatus).map(v => (
+              <option key={v} value={v}>{v}</option>
+            ))}
           </select>
         </div>
 
         {formData.Estado === EmployeeStatus.Inactivo && (
           <div>
             <label className={labelClass}>Fecha de Retiro</label>
-            <input type="date" name="Fecha_Retiro" value={formData.Fecha_Retiro} onChange={handleChange} className={inputClass} />
+            <input
+              type="date"
+              name="Fecha_Retiro"
+              value={formData.Fecha_Retiro}
+              onChange={handleChange}
+              className={inputClass}
+            />
           </div>
         )}
+
+        {/* FOTO (ocupa el ancho completo en desktop) */}
+        <div className="md:col-span-2">
+          <label className={labelClass}>Foto (opcional)</label>
+          <div className="flex items-center space-x-4">
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handlePhotoChange}
+              className="text-sm text-gray-300"
+            />
+            {formData.Foto && (
+              <img
+                src={formData.Foto}
+                alt="Vista previa"
+                className="w-16 h-16 rounded-full object-cover border border-gray-600"
+              />
+            )}
+          </div>
+        </div>
       </div>
 
       <div className="flex justify-end pt-4 space-x-2">
-        <button type="button" onClick={onClose} className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg">
+        <button
+          type="button"
+          onClick={onClose}
+          className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg"
+        >
           Cancelar
         </button>
 
-        <button type="submit" className="bg-primary hover:bg-secondary text-white font-bold py-2 px-4 rounded-lg">
+        <button
+          type="submit"
+          className="bg-primary hover:bg-secondary text-white font-bold py-2 px-4 rounded-lg"
+        >
           {employeeToEdit ? 'Actualizar' : 'Crear'} Empleado
         </button>
       </div>
@@ -164,8 +300,12 @@ const EmployeeForm: React.FC<{
 // -----------------------------
 // LISTA DE EMPLEADOS
 // -----------------------------
-const EmployeeView: React.FC<EmployeeViewProps> = ({ employees, onAdd, onUpdate, onDelete }) => {
-
+const EmployeeView: React.FC<EmployeeViewProps> = ({
+  employees,
+  onAdd,
+  onUpdate,
+  onDelete,
+}) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [employeeToEdit, setEmployeeToEdit] = useState<Employee | null>(null);
 
@@ -187,7 +327,7 @@ const EmployeeView: React.FC<EmployeeViewProps> = ({ employees, onAdd, onUpdate,
   };
 
   const handleFormSubmit = (employeeData: Omit<Employee, 'ID'> | Employee) => {
-    if ("ID" in employeeData) {
+    if ('ID' in employeeData) {
       onUpdate(employeeData);
     } else {
       onAdd(employeeData);
@@ -196,19 +336,18 @@ const EmployeeView: React.FC<EmployeeViewProps> = ({ employees, onAdd, onUpdate,
 
   return (
     <div>
-
       <div className="flex justify-end mb-4">
-        <button 
-          onClick={handleAddClick} 
-          className="bg-primary hover:bg-secondary text-white font-bold py-2 px-4 rounded-lg">
+        <button
+          onClick={handleAddClick}
+          className="bg-primary hover:bg-secondary text-white font-bold py-2 px-4 rounded-lg"
+        >
           + Agregar Empleado
         </button>
       </div>
 
       <div className="overflow-x-auto">
         <table className="w-full text-sm text-left text-gray-400">
-
-          <thead className="text-xs text-gray-200 uppercase bg-gray-700">
+          <thead className="text-xs text-gray-2 00 uppercase bg-gray-700">
             <tr>
               <th className="px-6 py-3">Nombre</th>
               <th className="px-6 py-3">Cédula</th>
@@ -220,47 +359,60 @@ const EmployeeView: React.FC<EmployeeViewProps> = ({ employees, onAdd, onUpdate,
 
           <tbody>
             {employees.map(employee => (
-              <tr key={employee.ID} className="bg-gray-800 border-b border-gray-700 hover:bg-gray-600">
-
-                <td className="px-6 py-4">{employee.Nombres} {employee.Apellidos}</td>
+              <tr
+                key={employee.ID}
+                className="bg-gray-800 border-b border-gray-700 hover:bg-gray-600"
+              >
+                <td className="px-6 py-4">
+                  {employee.Nombres} {employee.Apellidos}
+                </td>
                 <td className="px-6 py-4">{employee.Cedula}</td>
                 <td className="px-6 py-4">{employee.Cargo}</td>
 
                 <td className="px-6 py-4">
-                  <span className={`px-2 py-1 rounded-full text-xs ${
-                    employee.Estado === 'Activo'
-                      ? 'bg-green-900 text-green-300'
-                      : 'bg-red-900 text-red-300'
-                  }`}>
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs ${
+                      employee.Estado === 'Activo'
+                        ? 'bg-green-900 text-green-300'
+                        : 'bg-red-900 text-red-300'
+                    }`}
+                  >
                     {employee.Estado}
                   </span>
                 </td>
 
                 <td className="px-6 py-4 space-x-3">
-                  <button 
-                    onClick={() => handleEditClick(employee)} 
-                    className="font-medium text-accent hover:underline">
+                  <button
+                    onClick={() => handleEditClick(employee)}
+                    className="font-medium text-accent hover:underline"
+                  >
                     Editar
                   </button>
 
-                  <button 
-                    onClick={() => handleDeleteClick(employee.ID)} 
-                    className="font-medium text-red-400 hover:underline">
+                  <button
+                    onClick={() => handleDeleteClick(employee.ID)}
+                    className="font-medium text-red-400 hover:underline"
+                  >
                     Eliminar
                   </button>
                 </td>
-
               </tr>
             ))}
           </tbody>
-
         </table>
       </div>
 
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={employeeToEdit ? 'Editar Empleado' : 'Nuevo Empleado'}>
-        <EmployeeForm onSubmit={handleFormSubmit} onClose={() => setIsModalOpen(false)} employeeToEdit={employeeToEdit} />
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title={employeeToEdit ? 'Editar Empleado' : 'Nuevo Empleado'}
+      >
+        <EmployeeForm
+          onSubmit={handleFormSubmit}
+          onClose={() => setIsModalOpen(false)}
+          employeeToEdit={employeeToEdit}
+        />
       </Modal>
-
     </div>
   );
 };
