@@ -205,6 +205,17 @@ const App: React.FC = () => {
     setEmployees(newList);
   };
 
+
+    const deleteEmployee = (id: number) => {
+    if (!window.confirm('¿Seguro que deseas eliminar este empleado?')) return;
+
+    // Borramos del estado
+    const newList = employees.filter((e) => e.ID !== id);
+    // Nos aseguramos de limpiar las fotos igual que en el resto de operaciones
+    const sanitized = newList.map(stripFoto);
+    setEmployees(sanitized);
+  };
+
   // ✅ Guardar nómina
   const addPayroll = (
     payroll: Omit<PayrollEntry, 'ID_Mov' | 'Fecha_Registro'>,
