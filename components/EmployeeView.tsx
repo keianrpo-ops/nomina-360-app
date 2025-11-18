@@ -440,7 +440,6 @@ const EmployeeView: React.FC<EmployeeViewProps> = ({
           </tbody>
         </table>
       </div>
-
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
