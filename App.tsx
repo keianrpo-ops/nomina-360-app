@@ -385,7 +385,7 @@ const App: React.FC = () => {
 />
 
           <h1 className="text-xs font-bold mt-2 text-center tracking-wide">
-            Nómina 360
+            NOMINA ECO-PARADISE
           </h1>
         </div>
 
