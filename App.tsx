@@ -22,8 +22,8 @@ import {
   SHEET_SETTLEMENTS,
 } from './services/services/googleSheetsService';
 
-// 👇 Ruta correcta del logo (archivo está en src/assets)
-import macawLogo from './assets/macaw-logo-3d.png';
+// 👈 RUTA CORRECTA DESDE App.tsx
+import macawLogo from './src/assets/macaw-logo-3d.png';
 
 // Helper: NO guardar la foto en localStorage (solo en Sheets)
 const stripFoto = (emp: Employee): Employee => ({
