@@ -1,7 +1,7 @@
 import React from 'react';
 import { SettlementCalculationResult } from '../../types';
 import { formatCurrency, COMPANY_INFO } from '../../constants';
-import macawLogo from '../../assets/macaw-logo-3d.png';
+import macawLogo from './src/assets/macaw-logo-3d.png';
 
 interface SettlementReceiptProps {
   data: SettlementCalculationResult;
