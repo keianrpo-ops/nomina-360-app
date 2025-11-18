@@ -1,6 +1,7 @@
 import React from 'react';
 import { SettlementCalculationResult } from '../../types';
-import { formatCurrency } from '../../constants';
+import { formatCurrency, COMPANY_INFO } from '../../constants';
+import macawLogo from '../../assets/macaw-logo-3d.png';
 
 interface SettlementReceiptProps {
   data: SettlementCalculationResult;
@@ -8,19 +9,14 @@ interface SettlementReceiptProps {
 
 const CompanyLogo = () => (
   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '8px' }}>
-    <div
-      style={{
-        width: '40px',
-        height: '40px',
-        backgroundColor: '#4A5568',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-    >
-      <div style={{ width: '20px', height: '20px', backgroundColor: '#E2E8F0' }}></div>
-    </div>
-    <span style={{ fontWeight: 'bold', color: '#2D3748', fontSize: '16px' }}>EMPRESA</span>
+    <img
+      src={macawLogo}
+      alt={COMPANY_INFO.name}
+      style={{ width: '40px', height: '40px', borderRadius: '50%' }}
+    />
+    <span style={{ fontWeight: 'bold', color: '#2D3748', fontSize: '16px' }}>
+      {COMPANY_INFO.name}
+    </span>
   </div>
 );
 
@@ -256,7 +252,7 @@ const SettlementReceipt: React.FC<SettlementReceiptProps> = ({ data }) => {
                   color: '#A0AEC0',
                 }}
               >
-                Empresa S.A.S | NIT: 900.123.456
+                {COMPANY_INFO.name} | NIT: {COMPANY_INFO.nit}
               </p>
               <p
                 style={{
@@ -265,7 +261,7 @@ const SettlementReceipt: React.FC<SettlementReceiptProps> = ({ data }) => {
                   color: '#A0AEC0',
                 }}
               >
-                Calle Falsa 123, Colombia
+                {COMPANY_INFO.address}
               </p>
             </div>
           </div>
@@ -532,7 +528,7 @@ const SettlementReceipt: React.FC<SettlementReceiptProps> = ({ data }) => {
                   fontSize: '10px',
                 }}
               >
-                Empresa S.A.S
+                {COMPANY_INFO.name}
               </p>
             </div>
           </div>
