@@ -22,10 +22,9 @@ import {
   SHEET_SETTLEMENTS,
 } from './services/services/googleSheetsService';
 
-// 👈 RUTA CORRECTA DESDE App.tsx
-import macawLogo from './src/assets/macaw-logo-3d.png';
+import macawLogo from './assets/macaw-logo-3d.png';
 
-// Helper: NO guardar la foto en localStorage (solo en Sheets)
+// 🔹 Helper: NO guardar la foto en localStorage (solo en Sheets)
 const stripFoto = (emp: Employee): Employee => ({
   ...emp,
   Foto: '',
@@ -139,7 +138,7 @@ const App: React.FC = () => {
   );
   const [activeView, setActiveView] = useState<AppView>('employees');
 
-  // Botón de prueba Google Sheets
+  // 🔹 Botón de prueba Google Sheets
   const probarConexion = async () => {
     try {
       await addToSheet(SHEET_EMPLOYEES, {
@@ -162,11 +161,13 @@ const App: React.FC = () => {
       alert('✅ Se guardó un empleado de prueba en Google Sheets');
     } catch (error) {
       console.error(error);
-      alert('❌ Error al guardar en Google Sheets. Revisa la consola del navegador.');
+      alert(
+        '❌ Error al guardar en Google Sheets. Revisa la consola del navegador.',
+      );
     }
   };
 
-  // Guardar empleado (foto SOLO en Sheets, NO en localStorage)
+  // ✅ Guardar empleado (foto SOLO en Sheets, NO en localStorage)
   const addEmployee = (employee: Omit<Employee, 'ID'>) => {
     const newEmployee: Employee = { ...employee, ID: Date.now() };
 
@@ -205,14 +206,22 @@ const App: React.FC = () => {
     setEmployees(newList);
   };
 
-  // Eliminar empleado (la confirmación se hace en EmployeeView)
-  const deleteEmployee = (id: number) => {
-    const sanitizedExisting = employees.map(stripFoto);
-    const newList = sanitizedExisting.filter((e) => e.ID !== id);
-    setEmployees(newList);
+  // ✅ Borrado masivo de empleados (para EmployeeView)
+  const deleteEmployees = (ids: number[]) => {
+    if (ids.length === 0) return;
+    if (
+      !window.confirm(
+        `¿Seguro que deseas eliminar ${ids.length} empleado(s) seleccionado(s)?`,
+      )
+    ) {
+      return;
+    }
+    const remaining = employees.filter((e) => !ids.includes(e.ID));
+    const sanitized = remaining.map(stripFoto);
+    setEmployees(sanitized);
   };
 
-  // Guardar nómina
+  // ✅ Guardar nómina
   const addPayroll = (
     payroll: Omit<PayrollEntry, 'ID_Mov' | 'Fecha_Registro'>,
   ) => {
@@ -254,7 +263,14 @@ const App: React.FC = () => {
     });
   };
 
-  // Guardar liquidación
+  // ✅ Borrado masivo de nóminas (Historial)
+  const deletePayrolls = (ids: number[]) => {
+    if (ids.length === 0) return;
+    const remaining = payrolls.filter((p) => !ids.includes(p.ID_Mov));
+    setPayrolls(remaining);
+  };
+
+  // ✅ Guardar liquidación
   const addSettlement = (
     settlement: Omit<SettlementEntry, 'ID_Liq' | 'Fecha_Registro'>,
   ) => {
@@ -297,6 +313,13 @@ const App: React.FC = () => {
         'La liquidación se guardó en la app, pero hubo un error al guardar en Google Sheets.',
       );
     });
+  };
+
+  // ✅ Borrado masivo de liquidaciones (Historial)
+  const deleteSettlements = (ids: number[]) => {
+    if (ids.length === 0) return;
+    const remaining = settlements.filter((s) => !ids.includes(s.ID_Liq));
+    setSettlements(remaining);
   };
 
   const loadDemoData = useCallback(() => {
@@ -442,10 +465,9 @@ const App: React.FC = () => {
               employees={employees}
               onAdd={addEmployee}
               onUpdate={updateEmployee}
-              onDelete={deleteEmployee}
+              onDelete={deleteEmployees}
             />
           )}
-
           {activeView === 'payroll' && (
             <PayrollView
               employees={employees}
@@ -453,7 +475,6 @@ const App: React.FC = () => {
               onRegister={addPayroll}
             />
           )}
-
           {activeView === 'settlement' && (
             <SettlementView
               employees={employees}
@@ -461,15 +482,15 @@ const App: React.FC = () => {
               onRegister={addSettlement}
             />
           )}
-
           {activeView === 'history' && (
             <HistoryView
               payrolls={payrolls}
               settlements={settlements}
               employees={employees}
+              onDeletePayrolls={deletePayrolls}
+              onDeleteSettlements={deleteSettlements}
             />
           )}
-
           {activeView === 'parameters' && (
             <ParametersView
               parameters={parameters}
