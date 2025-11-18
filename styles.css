@@ -1,16 +1,18 @@
-/* ===== PALETA MACAW HOTEL – TEMA CLARO ===== */
+/* ============== PALETA MACAW HOTEL (CLARA) ============== */
 :root {
-  --macaw-teal: #00a4e4;
-  --macaw-teal-dark: #0080b5;
-  --macaw-yellow: #ffc933;
-  --macaw-bg: #f4fcff;
-  --macaw-card: #ffffff;
-  --macaw-text-main: #074455;
-  --macaw-text-soft: #4a7484;
-  --macaw-border-soft: rgba(6, 126, 161, 0.15);
+  --macaw-blue: #02A9E7;
+  --macaw-blue-soft: #7ad7ff;
+  --macaw-bg: #EAF8FF;
+  --macaw-row: #ffffff;
+  --macaw-row-alt: #f6fbff;
+  --macaw-sidebar: #02A9E7;
+  --macaw-sidebar-dark: #0084b5;
+  --macaw-text-main: #094063;
+  --macaw-text-muted: #5f7d96;
+  --macaw-accent-yellow: #FFC933;
 }
 
-/* Fondo general */
+/* Fondo global */
 body {
   margin: 0;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -18,137 +20,87 @@ body {
   color: var(--macaw-text-main);
 }
 
-/* Panel central que envuelve todo (bg-base-100 en tu JSX) */
+/* Panel principal (tarjeta grande donde está la tabla) */
 .bg-base-100 {
-  background-color: var(--macaw-bg) !important;
-}
-
-/* Tarjeta grande central (donde está la tabla, className="bg-neutral") */
-.bg-neutral {
-  background: var(--macaw-card) !important;
+  background-color: #ffffff !important;
+  box-shadow: 0 18px 35px rgba(0, 0, 0, 0.05);
   border-radius: 18px;
-  border: 1px solid var(--macaw-border-soft);
-  box-shadow: 0 14px 40px rgba(0, 120, 160, 0.12);
 }
 
-/* ===== SIDEBAR ===== */
-nav {
-  background: linear-gradient(180deg, var(--macaw-teal), var(--macaw-teal-dark)) !important;
-  color: #ffffff;
-}
-
-/* Encabezado del sidebar con logo */
-.sidebar-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 24px;
-}
-
-.sidebar-logo-wrapper {
-  width: 54px;
-  height: 54px;
-  border-radius: 50%;
-  background: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
-}
-
-.sidebar-logo {
-  width: 44px;
-  height: 44px;
-  object-fit: contain;
-}
-
-.sidebar-title {
-  font-size: 1.05rem;
-  font-weight: 700;
-  line-height: 1.2;
-}
-
-/* Botón del menú activo (el círculo amarillo de Empleados que ya ves) */
-button, a {
-  font-family: inherit;
-}
-
-/* ===== BOTONES SUPERIORES ===== */
-.bg-primary {
-  background: var(--macaw-teal) !important;
+/* ================= SIDEBAR ================= */
+nav,
+.drawer-side,
+.drawer-side .menu {
+  background: var(--macaw-sidebar) !important;
   color: #ffffff !important;
-  border-radius: 999px !important;
-  box-shadow: 0 10px 25px rgba(0, 164, 228, 0.35);
-  border: none;
+}
+
+/* Items del menú lateral (Empleados, Nómina, etc.) */
+.drawer-side .menu li > * {
+  color: #ffffff !important;
+  border-radius: 999px;
+}
+
+.drawer-side .menu li > *:hover {
+  background: var(--macaw-sidebar-dark) !important;
+}
+
+/* Botones redondos del lateral */
+.btn-ghost,
+.btn-circle {
+  background: rgba(255,255,255,0.18) !important;
+  color: #ffffff !important;
+}
+.btn-ghost:hover,
+.btn-circle:hover {
+  background: rgba(255,255,255,0.28) !important;
+}
+
+/* ================= BOTONES SUPERIORES ================= */
+.bg-primary {
+  background: var(--macaw-blue) !important;
+  color: #ffffff !important;
+  border-radius: 999px;
 }
 .bg-primary:hover {
-  background: #19b5f3 !important;
+  background: #0194cf !important;
 }
 
 .bg-secondary {
-  background: var(--macaw-yellow) !important;
-  color: #084457 !important;
-  border-radius: 999px !important;
-  border: none;
-}
-.bg-secondary:hover {
-  filter: brightness(1.05);
+  background: var(--macaw-accent-yellow) !important;
+  color: #1b2940 !important;
 }
 
-/* Título grande “Gestión De Empleados” */
-h2 {
-  letter-spacing: 0.03em;
-  color: var(--macaw-text-main);
-}
-
-/* ===== TABLA ===== */
+/* ================= TABLA ================= */
 
 /* Encabezado */
+thead,
 thead.bg-gray-700 {
-  background: #e3f6ff !important;
+  background: #E1F6FF !important;
   color: var(--macaw-text-main) !important;
-  border-bottom: 1px solid var(--macaw-border-soft);
 }
 
-/* Filas */
+/* Filas: adiós barras negras */
 tbody tr {
-  background: #ffffff;
-  border-bottom: 1px solid rgba(6, 126, 161, 0.08);
+  background-color: var(--macaw-row);
 }
 tbody tr:nth-child(even) {
-  background: #f8fcff;
+  background-color: var(--macaw-row-alt);
 }
 tbody tr:hover {
-  background: #e8f7ff !important;
+  background-color: #dff3ff !important;
 }
 
 /* Pills de estado */
 .bg-green-900 {
-  background-color: #00a060 !important;
+  background-color: #4bbf73 !important;
 }
 .text-green-300 {
-  color: #eafff4 !important;
+  color: #e9fff3 !important;
 }
-
 .bg-red-900 {
-  background-color: #e44242 !important;
+  background-color: #ff5c75 !important;
 }
 .text-red-300 {
-  color: #ffeaea !important;
-}
-
-/* Links Editar / Eliminar */
-.text-accent {
-  color: var(--macaw-teal) !important;
-}
-.text-red-400 {
-  color: #ff4b4b !important;
-}
-
-/* Ajustes pequeños para que todo se vea más liviano */
-table {
-  border-collapse: collapse;
-}
-th, td {
-  font-size: 0.9rem;
+  color: #ffe9ed !important;
 }
