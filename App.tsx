@@ -378,10 +378,11 @@ const App: React.FC = () => {
         {/* Logo Macaw */}
         <div className="flex flex-col items-center mb-6 hidden md:flex">
           <img
-            src="/macaw-logo-3d.png"
-            alt="Macaw Logo"
-            className="h-10 w-10 rounded-full bg-white object-cover shadow-md"
-          />
+  src={macawLogo}
+  alt="Macaw Logo"
+  className="h-10 w-10 rounded-full bg-white object-cover shadow-md"
+/>
+
           <h1 className="text-xs font-bold mt-2 text-center tracking-wide">
             Nómina 360
           </h1>
