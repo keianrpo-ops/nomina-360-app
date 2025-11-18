@@ -22,8 +22,8 @@ import {
   SHEET_SETTLEMENTS,
 } from './services/services/googleSheetsService';
 
-import macawLogo from './src/assets/macaw-logo-3d.png';
-
+// 👇 RUTA CORRECTA (el archivo está en src/assets)
+import macawLogo from './assets/macaw-logo-3d.png';
 
 // 🔹 Helper: NO guardar la foto en localStorage (solo en Sheets)
 const stripFoto = (emp: Employee): Employee => ({
@@ -205,15 +205,11 @@ const App: React.FC = () => {
     setEmployees(newList);
   };
 
-
-    const deleteEmployee = (id: number) => {
-    if (!window.confirm('¿Seguro que deseas eliminar este empleado?')) return;
-
-    // Borramos del estado
-    const newList = employees.filter((e) => e.ID !== id);
-    // Nos aseguramos de limpiar las fotos igual que en el resto de operaciones
-    const sanitized = newList.map(stripFoto);
-    setEmployees(sanitized);
+  // ✅ Eliminar empleado (sin confirm aquí; se hace en EmployeeView)
+  const deleteEmployee = (id: number) => {
+    const sanitizedExisting = employees.map(stripFoto);
+    const newList = sanitizedExisting.filter((e) => e.ID !== id);
+    setEmployees(newList);
   };
 
   // ✅ Guardar nómina
@@ -361,7 +357,8 @@ const App: React.FC = () => {
     } else {
       alert('No se pudo calcular la nómina demo.');
     }
-  }, [employees, parameters]);
+  }, [employees, parameters, addPayroll, setActiveView as any]);
+  // el cast "as any" es solo para evitar warnings de dependencia, no afecta runtime
 
   // ========= NAV ITEM =========
   const NavItem: React.FC<{
@@ -390,10 +387,10 @@ const App: React.FC = () => {
         {/* Logo Macaw */}
         <div className="flex flex-col items-center mb-6 hidden md:flex">
           <img
-  src={macawLogo}
-  alt="Macaw Logo"
-  className="h-10 w-10 rounded-full bg-white object-cover shadow-md"
-/>
+            src={macawLogo}
+            alt="Macaw Logo"
+            className="h-10 w-10 rounded-full bg-white object-cover shadow-md"
+          />
 
           <h1 className="text-xs font-bold mt-2 text-center tracking-wide">
             NOMINA EcoParadise
@@ -446,6 +443,7 @@ const App: React.FC = () => {
               employees={employees}
               onAdd={addEmployee}
               onUpdate={updateEmployee}
+              onDelete={deleteEmployee}   {/* 👈 AQUÍ SE CONECTA ELIMINAR */}
             />
           )}
           {activeView === 'payroll' && (
