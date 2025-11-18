@@ -22,6 +22,10 @@ import {
   SHEET_SETTLEMENTS,
 } from './services/services/googleSheetsService';
 
+// 👇 NUEVO IMPORT
+import macawLogo from './assets/macaw-logo.png';
+
+
 // 🔹 Helper: NO guardar la foto en localStorage (solo en Sheets)
 const stripFoto = (emp: Employee): Employee => ({
   ...emp,
