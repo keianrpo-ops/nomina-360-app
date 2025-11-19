@@ -24,7 +24,7 @@ import {
 } from './services/services/googleSheetsService';
 
 // ⚠️ IMPORT CORRECTO DEL LOGO
-import macawLogo from './assets/macaw-logo-3d.png';
+import macawLogo from '../../../assets/macaw-logo-3d.png';
 
 // 🔹 Helper: NO guardar la foto en localStorage (solo en Sheets)
 const stripFoto = (emp: Employee): Employee => ({
