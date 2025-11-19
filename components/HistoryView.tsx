@@ -326,3 +326,4 @@ const HistoryView: React.FC<HistoryViewProps> = ({
 };
 
 export default HistoryView;
+ 
