@@ -521,7 +521,7 @@ const App: React.FC = () => {
             NOMINA EcoParadise
           </h1>
         </div>
-
+ 
         <NavItem view="employees" label="Empleados" icon={<UserGroupIcon />} />
         <NavItem view="payroll" label="Nómina" icon={<DocumentTextIcon />} />
         <NavItem view="settlement" label="Liquidación" icon={<BriefcaseIcon />} />
