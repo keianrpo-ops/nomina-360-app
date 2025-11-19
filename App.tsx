@@ -23,7 +23,8 @@ import {
   SHEET_SETTLEMENTS,
 } from './services/services/googleSheetsService';
 
-import macawLogo from './src/assets/macaw-logo-3d.png';
+// ⚠️ IMPORT CORRECTO DEL LOGO
+import macawLogo from './assets/macaw-logo-3d.png';
 
 // 🔹 Helper: NO guardar la foto en localStorage (solo en Sheets)
 const stripFoto = (emp: Employee): Employee => ({
@@ -140,14 +141,22 @@ const App: React.FC = () => {
   );
   const [activeView, setActiveView] = useState<AppView>('employees');
 
-  // 🔄 Cargar datos desde Google Sheets
+  // 🔄 Sincronizar desde Google Sheets (filtrando filas vacías)
   const syncFromSheets = useCallback(async () => {
     try {
       // ========= EMPLEADOS =========
       const empResp: any = await fetchSheet(SHEET_EMPLOYEES);
-      const empRows: any[] = Array.isArray(empResp.data)
+      const empRowsRaw: any[] = Array.isArray(empResp?.data)
         ? empResp.data
-        : empResp;
+        : empResp || [];
+
+      const empRows = empRowsRaw.filter(
+        (row: any) =>
+          row &&
+          row.id &&
+          row.cedula &&
+          (row.nombres || row.apellidos),
+      );
 
       const loadedEmployees: Employee[] = empRows.map((row: any) => ({
         ID: Number(row.id),
@@ -161,18 +170,21 @@ const App: React.FC = () => {
         Salario_Base: Number(row.salarioBase) || 0,
         Aux_Transporte: Number(row.auxTransporte) || 0,
         Correo: row.correo,
-        Estado: row.estado as any,
+        Estado: (row.estado as EmployeeStatus) ?? EmployeeStatus.Activo,
         Fecha_Retiro: row.fechaRetiro || '',
         Foto: '',
       }));
 
-      setEmployees(loadedEmployees.map(stripFoto));
+      if (loadedEmployees.length > 0) {
+        setEmployees(loadedEmployees.map(stripFoto));
+      }
 
       // ========= NÓMINAS =========
       const payResp: any = await fetchSheet(SHEET_PAYROLL);
-      const payRows: any[] = Array.isArray(payResp.data)
+      const payRowsRaw: any[] = Array.isArray(payResp?.data)
         ? payResp.data
-        : payResp;
+        : payResp || [];
+      const payRows = payRowsRaw.filter((row: any) => row && row.idMov);
 
       const loadedPayrolls: PayrollEntry[] = payRows.map((row: any) => ({
         ID_Mov: Number(row.idMov),
@@ -197,9 +209,10 @@ const App: React.FC = () => {
 
       // ========= LIQUIDACIONES =========
       const liqResp: any = await fetchSheet(SHEET_SETTLEMENTS);
-      const liqRows: any[] = Array.isArray(liqResp.data)
+      const liqRowsRaw: any[] = Array.isArray(liqResp?.data)
         ? liqResp.data
-        : liqResp;
+        : liqResp || [];
+      const liqRows = liqRowsRaw.filter((row: any) => row && row.idLiq);
 
       const loadedSettlements: SettlementEntry[] = liqRows.map((row: any) => ({
         ID_Liq: Number(row.idLiq),
@@ -220,7 +233,8 @@ const App: React.FC = () => {
       }));
 
       setSettlements(loadedSettlements);
-      console.log('✅ Datos sincronizados desde Google Sheets');
+
+      alert('✅ Datos sincronizados desde Google Sheets.');
     } catch (error) {
       console.error('Error al sincronizar desde Google Sheets:', error);
       alert(
@@ -229,10 +243,10 @@ const App: React.FC = () => {
     }
   }, [setEmployees, setPayrolls, setSettlements]);
 
-  // Sincronizar una vez al montar la app
+  // ▶️ Sincronizar al abrir en cualquier computador
   useEffect(() => {
     syncFromSheets().catch(e =>
-      console.error('Error en sincronización inicial:', e),
+      console.error('Error en sync inicial:', e),
     );
   }, [syncFromSheets]);
 
@@ -265,7 +279,7 @@ const App: React.FC = () => {
     }
   };
 
-  // ✅ Guardar empleado
+  // ✅ Guardar empleado (foto SOLO en Sheets, NO en localStorage)
   const addEmployee = (employee: Omit<Employee, 'ID'>) => {
     const newEmployee: Employee = { ...employee, ID: Date.now() };
 
@@ -304,9 +318,10 @@ const App: React.FC = () => {
     setEmployees(newList);
   };
 
-  // ✅ Borrado de UN empleado
+  // ✅ Borrado de UN empleado (EmployeeView llama uno por uno)
   const deleteEmployee = (id: number) => {
     setEmployees(prev => prev.filter(e => e.ID !== id).map(stripFoto));
+    // Si luego quieres borrar también en Sheets, aquí sería el lugar.
   };
 
   // ✅ Guardar nómina
@@ -319,7 +334,7 @@ const App: React.FC = () => {
       Fecha_Registro: new Date().toISOString().split('T')[0],
     };
 
-    setPayrolls([...payrolls, newPayroll]);
+    setPayrolls(prev => [...prev, newPayroll]);
 
     const empleado = employees.find(e => e.ID === newPayroll.Empleado_ID);
 
@@ -368,7 +383,7 @@ const App: React.FC = () => {
       Fecha_Registro: new Date().toISOString().split('T')[0],
     };
 
-    setSettlements([...settlements, newSettlement]);
+    setSettlements(prev => [...prev, newSettlement]);
 
     const employee = employees.find(e => e.ID === settlement.Empleado_ID);
     if (employee) {
@@ -524,7 +539,6 @@ const App: React.FC = () => {
             {activeView === 'history' && 'Historial de Movimientos'}
             {activeView === 'parameters' && 'Configuración de Parámetros'}
           </h2>
-
           <div className="flex items-center space-x-2">
             <button
               onClick={loadDemoData}
