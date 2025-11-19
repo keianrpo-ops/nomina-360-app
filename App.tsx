@@ -21,14 +21,11 @@ import {
   SHEET_EMPLOYEES,
   SHEET_PAYROLL,
   SHEET_SETTLEMENTS,
-  SHEET_HISTORY,   
+  SHEET_HISTORY,
 } from './services/services/googleSheetsService';
 
-// ⚠️ IMPORT CORRECTO DEL LOGO
-import macawLogo from './src/assets/macaw-logo-3d.png';
-
-
-
+// ✅ IMPORT CORRECTO DEL LOGO (App.tsx está en src, assets en src/assets)
+import macawLogo from './assets/macaw-logo-3d.png';
 
 // 🔹 Helper: NO guardar la foto en localStorage (solo en Sheets)
 const stripFoto = (emp: Employee): Employee => ({
@@ -322,10 +319,9 @@ const App: React.FC = () => {
     setEmployees(newList);
   };
 
-  // ✅ Borrado de UN empleado (EmployeeView llama uno por uno)
+  // ✅ Borrado de UN empleado
   const deleteEmployee = (id: number) => {
     setEmployees(prev => prev.filter(e => e.ID !== id).map(stripFoto));
-    // Si luego quieres borrar también en Sheets, aquí sería el lugar.
   };
 
   // ✅ Guardar nómina
@@ -368,9 +364,8 @@ const App: React.FC = () => {
         'La nómina se guardó en la app, pero hubo un error al guardar en Google Sheets.',
       );
     });
-  };
 
-      // 👇 También registrar un resumen en la hoja "Historial"
+    // 👇 También registrar un resumen en la hoja "Historial"
     const totalDevengado =
       newPayroll.Devengado_Salario +
       newPayroll.Devengado_Auxilio +
@@ -383,16 +378,16 @@ const App: React.FC = () => {
       newPayroll.Deduccion_Otros;
 
     addToSheet(SHEET_HISTORY, {
-      id: `nomina-${newPayroll.ID_Mov}`,          // identificador único
+      id: `nomina-${newPayroll.ID_Mov}`,
       empleado_id: newPayroll.Empleado_ID,
       fecha: newPayroll.Fecha_Registro,
       devengado: totalDevengado,
       deducciones: totalDeducciones,
       neto: newPayroll.Neto_Pagar,
-    }).catch((error) => {
+    }).catch(error => {
       console.error('Error al guardar historial de nómina:', error);
-      // No mostramos alert aquí para no molestar; es solo log.
     });
+  };
 
   // ✅ Borrado masivo de nóminas (Historial)
   const deletePayrolls = (ids: number[]) => {
@@ -444,19 +439,19 @@ const App: React.FC = () => {
         'La liquidación se guardó en la app, pero hubo un error al guardar en Google Sheets.',
       );
     });
-  };
 
-      // 👇 Registrar también en "Historial"
+    // 👇 Registrar también en "Historial"
     addToSheet(SHEET_HISTORY, {
       id: `liq-${newSettlement.ID_Liq}`,
       empleado_id: newSettlement.Empleado_ID,
       fecha: newSettlement.Fecha_Registro,
-      devengado: newSettlement.Total_Liquidacion,     // total liquidación
+      devengado: newSettlement.Total_Liquidacion,
       deducciones: newSettlement.Deducciones,
-      neto: newSettlement.Total_Liquidacion,          // lo que realmente pagas
-    }).catch((error) => {
+      neto: newSettlement.Total_Liquidacion,
+    }).catch(error => {
       console.error('Error al guardar historial de liquidación:', error);
     });
+  };
 
   // ✅ Borrado masivo de liquidaciones (Historial)
   const deleteSettlements = (ids: number[]) => {
@@ -561,7 +556,7 @@ const App: React.FC = () => {
             NOMINA EcoParadise
           </h1>
         </div>
- 
+
         <NavItem view="employees" label="Empleados" icon={<UserGroupIcon />} />
         <NavItem view="payroll" label="Nómina" icon={<DocumentTextIcon />} />
         <NavItem view="settlement" label="Liquidación" icon={<BriefcaseIcon />} />
