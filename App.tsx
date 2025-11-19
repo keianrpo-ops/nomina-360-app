@@ -24,7 +24,6 @@ import {
 
 import macawLogo from './src/assets/macaw-logo-3d.png';
 
-
 // 🔹 Helper: NO guardar la foto en localStorage (solo en Sheets)
 const stripFoto = (emp: Employee): Employee => ({
   ...emp,
@@ -125,16 +124,6 @@ const BriefcaseIcon = () => (
 
 // ========= COMPONENTE PRINCIPAL =========
 
-  const deletePayrolls = (ids: number[]) => {
-    if (ids.length === 0) return;
-    setPayrolls(prev => prev.filter(p => !ids.includes(p.ID_Mov)));
-  };
-
-  const deleteSettlements = (ids: number[]) => {
-    if (ids.length === 0) return;
-    setSettlements(prev => prev.filter(s => !ids.includes(s.ID_Liq)));
-  };
-
 const App: React.FC = () => {
   const [employees, setEmployees] = useLocalStorage<Employee[]>('employees', [
     DEMO_EMPLOYEE,
@@ -202,7 +191,7 @@ const App: React.FC = () => {
       estado: newEmployee.Estado,
       fechaRetiro: newEmployee.Fecha_Retiro || '',
       foto: newEmployee.Foto || '',
-    }).catch((error) => {
+    }).catch(error => {
       console.error('Error al guardar empleado en Google Sheets:', error);
       alert(
         'El empleado se guardó en la app, pero hubo un error al guardar en Google Sheets.',
@@ -212,25 +201,19 @@ const App: React.FC = () => {
 
   const updateEmployee = (updatedEmployee: Employee) => {
     const sanitizedExisting = employees.map(stripFoto);
-    const newList = sanitizedExisting.map((e) =>
+    const newList = sanitizedExisting.map(e =>
       e.ID === updatedEmployee.ID ? stripFoto(updatedEmployee) : e,
     );
     setEmployees(newList);
   };
 
-  // ✅ Borrado masivo de empleados (para EmployeeView)
-  const deleteEmployees = (ids: number[]) => {
-    if (ids.length === 0) return;
-    if (
-      !window.confirm(
-        `¿Seguro que deseas eliminar ${ids.length} empleado(s) seleccionado(s)?`,
-      )
-    ) {
-      return;
-    }
-    const remaining = employees.filter((e) => !ids.includes(e.ID));
-    const sanitized = remaining.map(stripFoto);
-    setEmployees(sanitized);
+  // ✅ Borrado de UN empleado (EmployeeView llama uno por uno)
+  const deleteEmployee = (id: number) => {
+    setEmployees(prev =>
+      prev.filter(e => e.ID !== id).map(stripFoto),
+    );
+    // Si luego quieres borrar también en Google Sheets,
+    // aquí agregamos la llamada a deleteEmployeeFromSheet(id)
   };
 
   // ✅ Guardar nómina
@@ -245,7 +228,7 @@ const App: React.FC = () => {
 
     setPayrolls([...payrolls, newPayroll]);
 
-    const empleado = employees.find((e) => e.ID === newPayroll.Empleado_ID);
+    const empleado = employees.find(e => e.ID === newPayroll.Empleado_ID);
 
     addToSheet(SHEET_PAYROLL, {
       idMov: newPayroll.ID_Mov,
@@ -267,7 +250,7 @@ const App: React.FC = () => {
       netoPagar: newPayroll.Neto_Pagar,
       pdfUrl: newPayroll.PDF_URL,
       observaciones: newPayroll.Observaciones,
-    }).catch((error) => {
+    }).catch(error => {
       console.error('Error al guardar nómina en Google Sheets:', error);
       alert(
         'La nómina se guardó en la app, pero hubo un error al guardar en Google Sheets.',
@@ -278,7 +261,7 @@ const App: React.FC = () => {
   // ✅ Borrado masivo de nóminas (Historial)
   const deletePayrolls = (ids: number[]) => {
     if (ids.length === 0) return;
-    const remaining = payrolls.filter((p) => !ids.includes(p.ID_Mov));
+    const remaining = payrolls.filter(p => !ids.includes(p.ID_Mov));
     setPayrolls(remaining);
   };
 
@@ -294,7 +277,7 @@ const App: React.FC = () => {
 
     setSettlements([...settlements, newSettlement]);
 
-    const employee = employees.find((e) => e.ID === settlement.Empleado_ID);
+    const employee = employees.find(e => e.ID === settlement.Empleado_ID);
     if (employee) {
       updateEmployee({
         ...employee,
@@ -319,7 +302,7 @@ const App: React.FC = () => {
       totalLiquidacion: newSettlement.Total_Liquidacion,
       pdfUrl: newSettlement.PDF_URL,
       observaciones: newSettlement.Observaciones,
-    }).catch((error) => {
+    }).catch(error => {
       console.error('Error al guardar liquidación en Google Sheets:', error);
       alert(
         'La liquidación se guardó en la app, pero hubo un error al guardar en Google Sheets.',
@@ -330,22 +313,22 @@ const App: React.FC = () => {
   // ✅ Borrado masivo de liquidaciones (Historial)
   const deleteSettlements = (ids: number[]) => {
     if (ids.length === 0) return;
-    const remaining = settlements.filter((s) => !ids.includes(s.ID_Liq));
+    const remaining = settlements.filter(s => !ids.includes(s.ID_Liq));
     setSettlements(remaining);
   };
 
   const loadDemoData = useCallback(() => {
-    if (employees.some((e) => e.ID === DEMO_EMPLOYEE.ID)) {
+    if (employees.some(e => e.ID === DEMO_EMPLOYEE.ID)) {
       alert('El empleado demo ya existe.');
       return;
     }
-    setEmployees((prev) => [...prev, DEMO_EMPLOYEE]);
+    setEmployees(prev => [...prev, DEMO_EMPLOYEE]);
     alert('Empleado demo cargado.');
   }, [employees, setEmployees]);
 
   const generateDemoPayroll = useCallback(() => {
     const demoEmployee = employees.find(
-      (e) => e.ID === DEMO_EMPLOYEE.ID && e.Estado === EmployeeStatus.Activo,
+      e => e.ID === DEMO_EMPLOYEE.ID && e.Estado === EmployeeStatus.Activo,
     );
     if (!demoEmployee) {
       alert(
@@ -477,7 +460,7 @@ const App: React.FC = () => {
               employees={employees}
               onAdd={addEmployee}
               onUpdate={updateEmployee}
-              onDelete={deleteEmployees}
+              onDelete={deleteEmployee} // 👈 AHORA recibe UN ID
             />
           )}
           {activeView === 'payroll' && (
