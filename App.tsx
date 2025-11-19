@@ -446,6 +446,18 @@ const App: React.FC = () => {
     });
   };
 
+      // 👇 Registrar también en "Historial"
+    addToSheet(SHEET_HISTORY, {
+      id: `liq-${newSettlement.ID_Liq}`,
+      empleado_id: newSettlement.Empleado_ID,
+      fecha: newSettlement.Fecha_Registro,
+      devengado: newSettlement.Total_Liquidacion,     // total liquidación
+      deducciones: newSettlement.Deducciones,
+      neto: newSettlement.Total_Liquidacion,          // lo que realmente pagas
+    }).catch((error) => {
+      console.error('Error al guardar historial de liquidación:', error);
+    });
+
   // ✅ Borrado masivo de liquidaciones (Historial)
   const deleteSettlements = (ids: number[]) => {
     if (ids.length === 0) return;
