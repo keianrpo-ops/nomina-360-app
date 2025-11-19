@@ -6,7 +6,7 @@ interface EmployeeViewProps {
   employees: Employee[];
   onAdd: (employee: Omit<Employee, 'ID'>) => void;
   onUpdate: (employee: Employee) => void;
-  onDelete: (id: number) => void;
+  onDelete: (id: number) => void; // 👈 elimina UN empleado por ID
 }
 
 // -----------------------------
@@ -371,7 +371,7 @@ const EmployeeView: React.FC<EmployeeViewProps> = ({
   const handleDeleteClick = (id: number) => {
     const ok = window.confirm('¿Seguro que deseas eliminar este empleado?');
     if (ok) {
-      onDelete(id);
+      onDelete(id); // 👈 aquí solo mandamos UN ID
     }
   };
 
@@ -408,7 +408,7 @@ const EmployeeView: React.FC<EmployeeViewProps> = ({
     );
     if (!ok) return;
 
-    selectedIds.forEach(id => onDelete(id));
+    selectedIds.forEach(id => onDelete(id)); // 👈 llamamos onDelete por cada ID
     setSelectedIds([]);
   };
 
