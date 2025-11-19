@@ -1,4 +1,12 @@
 import React, { useState, useCallback } from 'react';
+
+React.useEffect(() => {
+  // Al cargar la app, tratamos de leer lo último desde Sheets
+  syncFromSheets().catch((e) => {
+    console.error('Error en sync inicial:', e);
+  });
+}, []);
+
 import { useLocalStorage } from './hooks/useLocalStorage';
 import {
   Employee,
@@ -17,6 +25,7 @@ import HistoryView from './components/HistoryView';
 import { calculatePayroll } from './services/payrollService';
 import {
   addToSheet,
+  fetchSheet,            // 👈 añadir esto
   SHEET_EMPLOYEES,
   SHEET_PAYROLL,
   SHEET_SETTLEMENTS,
@@ -138,6 +147,91 @@ const App: React.FC = () => {
     DEFAULT_PARAMETERS,
   );
   const [activeView, setActiveView] = useState<AppView>('employees');
+
+
+  // 🔄 Cargar datos desde Google Sheets al abrir la app
+const syncFromSheets = async () => {
+  try {
+    // ========= EMPLEADOS =========
+    const empResp: any = await fetchSheet(SHEET_EMPLOYEES);
+    const empRows: any[] = Array.isArray(empResp.data) ? empResp.data : empResp;
+
+    const loadedEmployees: Employee[] = empRows.map((row: any) => ({
+      ID: Number(row.id),
+      Cedula: row.cedula,
+      Nombres: row.nombres,
+      Apellidos: row.apellidos,
+      Cargo: row.cargo,
+      Fecha_Ingreso: row.fechaIngreso,
+      Tipo_Contrato: row.tipoContrato as any,
+      Tipo_Sueldo: row.tipoSueldo as any,
+      Salario_Base: Number(row.salarioBase) || 0,
+      Aux_Transporte: Number(row.auxTransporte) || 0,
+      Correo: row.correo,
+      Estado: row.estado as any,
+      Fecha_Retiro: row.fechaRetiro || '',
+      Foto: '', // 👈 no guardamos la foto en localStorage
+    }));
+
+    setEmployees(loadedEmployees.map(stripFoto));
+
+    // ========= NÓMINAS =========
+    const payResp: any = await fetchSheet(SHEET_PAYROLL);
+    const payRows: any[] = Array.isArray(payResp.data) ? payResp.data : payResp;
+
+    const loadedPayrolls: PayrollEntry[] = payRows.map((row: any) => ({
+      ID_Mov: Number(row.idMov),
+      Fecha_Registro: row.fechaRegistro,
+      Periodo_Desde: row.periodoDesde,
+      Periodo_Hasta: row.periodoHasta,
+      Empleado_ID: Number(row.empleadoId),
+      Dias_Laborados: Number(row.diasLaborados) || 0,
+      Devengado_Salario: Number(row.devengadoSalario) || 0,
+      Devengado_Auxilio: Number(row.devengadoAuxilio) || 0,
+      Devengado_Otros: Number(row.devengadoOtros) || 0,
+      Deduccion_Salud: Number(row.deduccionSalud) || 0,
+      Deduccion_Pension: Number(row.deduccionPension) || 0,
+      Deduccion_FSP: Number(row.deduccionFsp) || 0,
+      Deduccion_Otros: Number(row.deduccionOtros) || 0,
+      Neto_Pagar: Number(row.netoPagar) || 0,
+      PDF_URL: row.pdfUrl || '',
+      Observaciones: row.observaciones || '',
+    }));
+
+    setPayrolls(loadedPayrolls);
+
+    // ========= LIQUIDACIONES =========
+    const liqResp: any = await fetchSheet(SHEET_SETTLEMENTS);
+    const liqRows: any[] = Array.isArray(liqResp.data) ? liqResp.data : liqResp;
+
+    const loadedSettlements: SettlementEntry[] = liqRows.map((row: any) => ({
+      ID_Liq: Number(row.idLiq),
+      Fecha_Registro: row.fechaRegistro,
+      Empleado_ID: Number(row.empleadoId),
+      Fecha_Ingreso: row.fechaIngreso,
+      Fecha_Retiro: row.fechaRetiro,
+      Dias_Antiguedad: Number(row.diasAntiguedad) || 0,
+      Cesantias: Number(row.cesantias) || 0,
+      Intereses_Cesantias: Number(row.interesesCesantias) || 0,
+      Prima: Number(row.prima) || 0,
+      Vacaciones: Number(row.vacaciones) || 0,
+      Otros_Conceptos: Number(row.otrosConceptos) || 0,
+      Deducciones: Number(row.deducciones) || 0,
+      Total_Liquidacion: Number(row.totalLiquidacion) || 0,
+      PDF_URL: row.pdfUrl || '',
+      Observaciones: row.observaciones || '',
+    }));
+
+    setSettlements(loadedSettlements);
+
+    alert('✅ Datos sincronizados desde Google Sheets.');
+  } catch (error) {
+    console.error('Error al sincronizar desde Google Sheets:', error);
+    alert(
+      '❌ Hubo un problema leyendo los datos desde Google Sheets. Revisa la consola.',
+    );
+  }
+};
 
   // 🔹 Botón de prueba Google Sheets
   const probarConexion = async () => {
@@ -431,6 +525,39 @@ const App: React.FC = () => {
             {activeView === 'history' && 'Historial de Movimientos'}
             {activeView === 'parameters' && 'Configuración de Parámetros'}
           </h2>
+          <div className="flex items-center space-x-2">
+          <button ...>Cargar Empleado Demo</button>
+          <button ...>Generar Nómina Demo</button>
+          <button ...>Probar conexión Google Sheets</button>
+        </div>
+
+          <div className="flex items-center space-x-2">
+  <button
+    onClick={loadDemoData}
+    className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg text-sm transition-colors"
+  >
+    Cargar Empleado Demo
+  </button>
+  <button
+    onClick={generateDemoPayroll}
+    className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-sm transition-colors"
+  >
+    Generar Nómina Demo
+  </button>
+  <button
+    onClick={probarConexion}
+    className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg text-sm transition-colors"
+  >
+    Probar conexión Google Sheets
+  </button>
+  <button
+    onClick={syncFromSheets}
+    className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg text-sm transition-colors"
+  >
+    Sincronizar ahora
+  </button>
+</div>
+
           <div className="flex items-center space-x-2">
             <button
               onClick={loadDemoData}
