@@ -9,6 +9,7 @@ export const SHEET_EMPLOYEES   = "Empleados";
 export const SHEET_PARAMETERS  = "Parametros";
 export const SHEET_PAYROLL     = "Nominas";
 export const SHEET_SETTLEMENTS = "Liquidaciones";
+export const SHEET_HISTORY     = "Historial";
 
 /**
  * Lee datos de una hoja de Google Sheets
