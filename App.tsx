@@ -21,6 +21,7 @@ import {
   SHEET_EMPLOYEES,
   SHEET_PAYROLL,
   SHEET_SETTLEMENTS,
+  SHEET_HISTORY,   
 } from './services/services/googleSheetsService';
 
 // ⚠️ IMPORT CORRECTO DEL LOGO
@@ -368,6 +369,30 @@ const App: React.FC = () => {
       );
     });
   };
+
+      // 👇 También registrar un resumen en la hoja "Historial"
+    const totalDevengado =
+      newPayroll.Devengado_Salario +
+      newPayroll.Devengado_Auxilio +
+      newPayroll.Devengado_Otros;
+
+    const totalDeducciones =
+      newPayroll.Deduccion_Salud +
+      newPayroll.Deduccion_Pension +
+      newPayroll.Deduccion_FSP +
+      newPayroll.Deduccion_Otros;
+
+    addToSheet(SHEET_HISTORY, {
+      id: `nomina-${newPayroll.ID_Mov}`,          // identificador único
+      empleado_id: newPayroll.Empleado_ID,
+      fecha: newPayroll.Fecha_Registro,
+      devengado: totalDevengado,
+      deducciones: totalDeducciones,
+      neto: newPayroll.Neto_Pagar,
+    }).catch((error) => {
+      console.error('Error al guardar historial de nómina:', error);
+      // No mostramos alert aquí para no molestar; es solo log.
+    });
 
   // ✅ Borrado masivo de nóminas (Historial)
   const deletePayrolls = (ids: number[]) => {
